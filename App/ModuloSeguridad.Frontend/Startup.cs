@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+using ModuloSeguridad.Entities;
+using Microsoft.EntityFrameworkCore;
+using ModuloSeguridad.Entities.Repository;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -29,13 +32,21 @@ namespace ModuloSeguridad.Frontend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddDbContext<ModuloSeguridadContext>(
+                options => options.UseSqlServer(
+                    Configuration.GetConnectionString("ModuloSeguridadContext")));
+
+            services.AddTransient(typeof(GenericRepository<>));
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime, ILoggerFactory loggerFactory)
         {
-            applicationLifetime.ApplicationStarted.Register(InicioAplicacion);
-            applicationLifetime.ApplicationStopped.Register(FinAplicacion);
+            applicationLifetime.ApplicationStarted.Register(ApplicationStarted);
+            applicationLifetime.ApplicationStopped.Register(ApplicationStopped);
+            applicationLifetime.ApplicationStopping.Register(ApplicationStopping);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -78,14 +89,19 @@ namespace ModuloSeguridad.Frontend
             });
         }
 
-        private void InicioAplicacion()
+        private void ApplicationStarted()
         {
             logger.LogInformation("Aplicación iniciada");
         }
 
-        private void FinAplicacion()
+        private void ApplicationStopped()
         {
             logger.LogInformation("Aplicación detenida");
+        }
+        
+        private void ApplicationStopping()
+        {
+            logger.LogInformation("La aplicación se está deteniendo");
         }
     }
 }
