@@ -1,17 +1,24 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration IConfiguration
+<!DOCTYPE html>
+<html lang="es-ar">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ModuloSeguridad.Frontend</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>@ViewData["Title"] - @Html.Raw(IConfiguration["Properties:Application"])</title>
+    <link href="~/user_security.ico" rel="icon" type="image/x-icon" />
+    <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
+    <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/mdbootstrap/css/mdb.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ModuloSeguridad.Frontend</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@IConfiguration["Properties:Application"]</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -40,9 +47,16 @@
             &copy; 2020 - ModuloSeguridad.Frontend - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/mdbootstrap/js/mdb.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/localization/messages_es_AR.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script>
+        document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

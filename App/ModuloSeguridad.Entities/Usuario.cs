@@ -6,14 +6,37 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class Usuario
+    public class Usuario : EntidadBase
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Key]
+        [Required]
+        [MaxLength(50)]
+        [MinLength(3)]
         public string NombreUsuario { get; set; }
+
+        [MaxLength(50)]
+        [MinLength(3)]
         public string Nombre { get; set; }
+
+        [MaxLength(50)]
+        [MinLength(3)]
         public string Apellido { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        [MinLength(3)]
         public string Clave { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        [MinLength(3)]
         public string Mail { get; set; }
+
+        public int EstadoUsuarioId { get; set; }
+
+        [ForeignKey(nameof(EstadoUsuarioId))]
+        public EstadoUsuario EstadoUsuario { get; set; }
+
+        public List<UsuarioGrupo> UsuarioGrupos { get; set; }
     }
 }

@@ -14,7 +14,8 @@ using System.Threading.Tasks;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using ModuloSeguridad.Entities;
 using Microsoft.EntityFrameworkCore;
-using ModuloSeguridad.Entities.Repository;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -34,19 +35,18 @@ namespace ModuloSeguridad.Frontend
             services.AddControllersWithViews();
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
-                    Configuration.GetConnectionString("ModuloSeguridadContext")));
-
-            services.AddTransient(typeof(GenericRepository<>));
-
-            services.AddDatabaseDeveloperPageExceptionFilter();
+                    Configuration.GetConnectionString("ModuloSeguridadContext")));            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime, ILoggerFactory loggerFactory)
         {
+            logger = loggerFactory.CreateLogger(typeof(Startup));
+
             applicationLifetime.ApplicationStarted.Register(ApplicationStarted);
             applicationLifetime.ApplicationStopped.Register(ApplicationStopped);
             applicationLifetime.ApplicationStopping.Register(ApplicationStopping);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -57,22 +57,6 @@ namespace ModuloSeguridad.Frontend
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseSerilogRequestLogging(options =>
-            {
-                //Customize the message template
-                options.MessageTemplate = "Handled {RequestPath}";
-
-                // Emit debug-level events instead of the defaults
-                options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Debug;
-
-                // Attach additional properties to the request completion event
-                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
-                {
-                    diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
-                    diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
-                };
-            });
-            logger = loggerFactory.CreateLogger(typeof(Startup));
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
