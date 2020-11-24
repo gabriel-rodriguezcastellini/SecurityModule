@@ -81,6 +81,13 @@
         "webfonts/fa-solid-900.woff",
         "webfonts/fa-solid-900.woff2"
       ]
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/",
+      "files": [
+        "jquery.validate.unobtrusive.min.js"
+      ]
     }
   ]
 }

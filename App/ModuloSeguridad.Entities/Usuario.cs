@@ -9,7 +9,7 @@ namespace ModuloSeguridad.Entities
     public class Usuario : EntidadBase
     {
         [Key]
-        [Required]
+        [Required(ErrorMessageResourceType =typeof(Validaciones), ErrorMessageResourceName =nameof(Validaciones.Requerido))]
         [MaxLength(50)]
         [MinLength(3)]
         public string NombreUsuario { get; set; }

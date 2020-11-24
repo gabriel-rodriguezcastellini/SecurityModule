@@ -80,12 +80,12 @@ namespace ModuloSeguridad.Frontend
 
         private void ApplicationStopped()
         {
-            logger.LogInformation("Aplicación detenida");
+            logger.LogCritical("Aplicación detenida");
         }
         
         private void ApplicationStopping()
         {
-            logger.LogInformation("La aplicación se está deteniendo");
+            logger.LogCritical("La aplicación se está deteniendo");
         }
     }
 }
