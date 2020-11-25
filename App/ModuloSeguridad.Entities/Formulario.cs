@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class Formulario : EntidadBase
+    public class Formulario : BaseEntity
     {
         public int FormularioId { get; set; }
 

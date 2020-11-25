@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class EntidadBase
+    public class BaseEntity
     {
         public bool Eliminado { get; set; }
 

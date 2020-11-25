@@ -13,15 +13,16 @@ namespace ModuloSeguridad.Frontend.Controllers
 {
     public class HomeController : BaseController
     {
-        public HomeController(ILogger<HomeController> logger, ModuloSeguridadContext context) : base(logger, context) 
-        { 
+        public HomeController(ILogger<HomeController> logger, ModuloSeguridadContext context) : base(logger, context)
+        {
 
-        }        
+        }
 
         public IActionResult Index()
         {
+            logger.LogInformation("entro 2");
             return View();
-        }        
+        }
         
         public IActionResult Error()
         {

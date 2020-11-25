@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
-    <UserSecretsId>85477096-3771-4eff-b84d-9b5d8956330d</UserSecretsId>	  
+    <UserSecretsId>85477096-3771-4eff-b84d-9b5d8956330d</UserSecretsId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,7 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Authorization\" />
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 

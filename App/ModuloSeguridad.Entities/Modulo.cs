@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class Modulo : EntidadBase
+    public class Modulo : BaseEntity
     {
         public int ModuloId { get; set; }
 

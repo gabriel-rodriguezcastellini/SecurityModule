@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class Usuario : EntidadBase
+    public class Usuario : BaseEntity
     {
         [Key]
         [Required(ErrorMessageResourceType =typeof(Validaciones), ErrorMessageResourceName =nameof(Validaciones.Requerido))]

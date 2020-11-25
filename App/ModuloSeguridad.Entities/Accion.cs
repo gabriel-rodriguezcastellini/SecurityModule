@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ModuloSeguridad.Entities
 {
-    public class Accion : EntidadBase
+    public class Accion : BaseEntity
     {
         public int AccionId { get; set; }
 

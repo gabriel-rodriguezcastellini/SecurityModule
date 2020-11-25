@@ -16,6 +16,10 @@ using ModuloSeguridad.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using ModuloSeguridad.Services;
+using ModuloSeguridad.Services.Helpers;
+using ModuloSeguridad.Services.Common;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -31,11 +35,22 @@ namespace ModuloSeguridad.Frontend
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddControllersWithViews();
+        {            
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
-                    Configuration.GetConnectionString("ModuloSeguridadContext")));            
+                    Configuration.GetConnectionString("ModuloSeguridadContext")));
+            services.AddTransient((container)=> 
+            {
+                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Unauthorized/";
+                options.AccessDeniedPath = "/Account/Forbidden/";
+                options.Cookie.Name = Enums.Cookies.Autenticacion.ToString();
+            });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,8 +77,10 @@ namespace ModuloSeguridad.Frontend
             app.UseStaticFiles();
 
             app.UseRouting();
-            
+
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
