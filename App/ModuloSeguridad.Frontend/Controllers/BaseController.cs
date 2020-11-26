@@ -2,15 +2,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
+using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Services.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
-    [Authorize]
     public class BaseController : Controller
     {
         protected readonly ILogger<BaseController> logger;
@@ -21,6 +22,6 @@ namespace ModuloSeguridad.Frontend.Controllers
             this.logger = logger;
             this.context = context;
             logHelper = new LogHelper(logger);
-        }
+        }        
     }
 }

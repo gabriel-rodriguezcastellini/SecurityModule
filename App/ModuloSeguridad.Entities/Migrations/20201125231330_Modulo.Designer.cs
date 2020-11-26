@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ModuloSeguridad.Entities;
 
 namespace ModuloSeguridad.Entities.Migrations
 {
     [DbContext(typeof(ModuloSeguridadContext))]
-    partial class ModuloSeguridadContextModelSnapshot : ModelSnapshot
+    [Migration("20201125231330_Modulo")]
+    partial class Modulo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +43,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -83,7 +85,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -121,7 +123,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -159,7 +161,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -205,7 +207,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -260,7 +262,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")
@@ -314,7 +316,7 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("FechaCreacion")
+                    b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaEliminacion")

@@ -11,6 +11,7 @@ using Serilog.Events;
 using System.IO;
 using Serilog.Formatting.Compact;
 using Serilog.Extensions.Logging;
+using Serilog.Filters;
 
 namespace ModuloSeguridad.Frontend
 {

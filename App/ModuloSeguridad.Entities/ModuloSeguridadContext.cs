@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ModuloSeguridad.Entities
@@ -21,7 +22,7 @@ namespace ModuloSeguridad.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<GrupoAccion>()                
+            modelBuilder.Entity<GrupoAccion>()
                 .HasKey(ga => new { ga.GrupoId, ga.AccionId });
 
             modelBuilder.Entity<GrupoAccion>()
@@ -46,6 +47,12 @@ namespace ModuloSeguridad.Entities
                 .HasOne(ug => ug.Grupo)
                 .WithMany(g => g.UsuarioGrupos)
                 .HasForeignKey(ug => ug.GrupoId);
+
+            modelBuilder.Entity<Modulo>()
+                .HasOne(m => m.ModuloPadre)
+                .WithMany(m => m.ModulosHijos)
+                .HasForeignKey(m => m.ModuloPadreId)
+                .IsRequired(false);
         }
     }
 }
