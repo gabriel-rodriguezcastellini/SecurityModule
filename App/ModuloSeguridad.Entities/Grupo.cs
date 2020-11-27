@@ -8,12 +8,16 @@ namespace ModuloSeguridad.Entities
 {
     public class Grupo : BaseEntity
     {
-        public int GrupoId { get; set; }
+        public int GrupoId { get; set; }        
 
-        [Required]
-        [MaxLength(50)]
         [MinLength(3)]
-        public string Nombre { get; set; }
+        [MaxLength(50)]
+        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Requerido))]
+        public string Codigo { get; set; }
+
+        [MinLength(3)]
+        [MaxLength(50)]
+        public string Descripcion { get; set; }
 
         public int EstadoGrupoId { get; set; }
 

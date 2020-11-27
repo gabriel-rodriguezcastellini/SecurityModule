@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,22 @@ namespace ModuloSeguridad.Frontend.Controllers
     public class UsuariosController : BaseController
     {
         private readonly UsuarioService usuarioService;
-        public UsuariosController(ModuloSeguridadContext context, ILogger<UsuariosController> logger, UsuarioService usuarioService) : base(logger, context)
+        public UsuariosController(ILogger<UsuariosController> logger, UsuarioService usuarioService) : base(logger)
         {
             this.usuarioService = usuarioService;
         }
 
-        // GET: Usuarios
+        [AllowAnonymous]
+        [Route(nameof(Login))]
         public IActionResult Login()
         {
-            return View(new Usuario());
+            return View();
+        }
+        
+        [Route(nameof(RecuperarClave))]
+        public void RecuperarClave()
+        {
+            //return 
         }
 
         //// GET: Usuarios/Details/5

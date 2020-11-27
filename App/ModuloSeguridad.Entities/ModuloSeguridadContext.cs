@@ -22,6 +22,26 @@ namespace ModuloSeguridad.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Accion>()
+                .HasIndex(a => a.Nombre)
+                .IsUnique();
+
+            modelBuilder.Entity<EstadoGrupo>()
+                .HasIndex(eg => eg.Nombre)
+                .IsUnique();
+
+            modelBuilder.Entity<EstadoUsuario>()
+                .HasIndex(eu => eu.Nombre)
+                .IsUnique();
+
+            modelBuilder.Entity<Formulario>()
+                .HasIndex(f => f.Nombre)
+                .IsUnique();
+
+            modelBuilder.Entity<Grupo>()
+                .HasIndex(g => g.Codigo)
+                .IsUnique();
+
             modelBuilder.Entity<GrupoAccion>()
                 .HasKey(ga => new { ga.GrupoId, ga.AccionId });
 
@@ -35,6 +55,16 @@ namespace ModuloSeguridad.Entities
                 .WithMany(a => a.GrupoAcciones)
                 .HasForeignKey(ga => ga.AccionId);
 
+            modelBuilder.Entity<Modulo>()                
+                .HasOne(m => m.ModuloPadre)
+                .WithMany(m => m.ModulosHijos)
+                .HasForeignKey(m => m.ModuloPadreId)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Modulo>()
+                .HasIndex(m => m.Nombre)
+                .IsUnique();
+
             modelBuilder.Entity<UsuarioGrupo>()
                 .HasKey(ug => new { ug.NombreUsuario, ug.GrupoId });
 
@@ -46,13 +76,30 @@ namespace ModuloSeguridad.Entities
             modelBuilder.Entity<UsuarioGrupo>()
                 .HasOne(ug => ug.Grupo)
                 .WithMany(g => g.UsuarioGrupos)
-                .HasForeignKey(ug => ug.GrupoId);
+                .HasForeignKey(ug => ug.GrupoId);            
+        }
 
-            modelBuilder.Entity<Modulo>()
-                .HasOne(m => m.ModuloPadre)
-                .WithMany(m => m.ModulosHijos)
-                .HasForeignKey(m => m.ModuloPadreId)
-                .IsRequired(false);
+        public override int SaveChanges()
+        {
+            ChangeTracker.DetectChanges();
+
+            foreach (var item in ChangeTracker.Entries().Where(t=>t.State == EntityState.Added).Select(t=>t.Entity).ToArray())
+            {
+                if (item is BaseEntity)
+                {
+                    (item as BaseEntity).FechaCreacion = DateTime.Now;
+                }
+            }
+
+            foreach (var item in ChangeTracker.Entries().Where(t => t.State == EntityState.Modified).Select(t => t.Entity).ToArray())
+            {
+                if (item is BaseEntity)
+                {
+                    (item as BaseEntity).FechaActualizacion = DateTime.Now;
+                }
+            }
+
+            return base.SaveChanges();
         }
     }
 }

@@ -9,9 +9,9 @@ namespace ModuloSeguridad.Entities
     {
         public int EstadoGrupoId { get; set; }
 
-        [Required]
         [MaxLength(50)]
         [MinLength(3)]
+        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Requerido))]
         public string Nombre { get; set; }
 
         public List<Grupo> Grupos { get; set; }

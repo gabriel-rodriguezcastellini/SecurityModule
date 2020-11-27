@@ -1,26 +1,20 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using ModuloSeguridad.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using ModuloSeguridad.Services;
-using ModuloSeguridad.Services.Helpers;
-using ModuloSeguridad.Services.Common;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ModuloSeguridad.Frontend.Controllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -39,7 +33,7 @@ namespace ModuloSeguridad.Frontend
         {            
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
-                    Configuration.GetConnectionString("ModuloSeguridadContext")));
+                    Configuration.GetConnectionString(nameof(ModuloSeguridadContext))));            
 
             services.AddTransient((container)=> 
             {
@@ -49,30 +43,28 @@ namespace ModuloSeguridad.Frontend
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = "/Usuarios/Login/";
-                options.AccessDeniedPath = "/Usuarios/Forbidden/";
+                options.LoginPath = string.Concat("/",nameof(UsuariosController.Login));
+                options.AccessDeniedPath = string.Concat("/",nameof(ErrorController.Forbidden));
             });
 
-            services.AddControllersWithViews();
+            services.AddControllers(config =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
 
-            //services.AddControllers(config =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                     .RequireAuthenticatedUser()
-            //                     .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
-            //});
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime, ILoggerFactory loggerFactory)
         {
             logger = loggerFactory.CreateLogger(typeof(Startup));
-
             applicationLifetime.ApplicationStarted.Register(ApplicationStarted);
             applicationLifetime.ApplicationStopped.Register(ApplicationStopped);
             applicationLifetime.ApplicationStopping.Register(ApplicationStopping);
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -82,7 +74,6 @@ namespace ModuloSeguridad.Frontend
                 app.UseExceptionHandler(string.Concat("/", nameof(ErrorController.ErrorHandler)));
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -90,13 +81,11 @@ namespace ModuloSeguridad.Frontend
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(new CookiePolicyOptions() { MinimumSameSitePolicy = SameSiteMode.Strict });
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Usuarios}/{action=Login}/{id?}");
+                endpoints.MapDefaultControllerRoute();
             });
         }
 

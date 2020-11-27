@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,12 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         [Route(nameof(Error))]
         public IActionResult Error()
+        {
+            return View();
+        }
+
+        [Route(nameof(Forbidden))]
+        public IActionResult Forbidden()
         {
             return View();
         }

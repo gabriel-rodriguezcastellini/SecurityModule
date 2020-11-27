@@ -12,6 +12,7 @@ namespace ModuloSeguridad.Entities
         [Required(ErrorMessageResourceType =typeof(Validaciones), ErrorMessageResourceName =nameof(Validaciones.Requerido))]
         [MaxLength(50)]
         [MinLength(3)]
+        [Display(Name =nameof(Usuario))]
         public string NombreUsuario { get; set; }
 
         [MaxLength(50)]

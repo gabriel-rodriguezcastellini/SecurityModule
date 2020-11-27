@@ -1,13 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Win32.SafeHandles;
 using ModuloSeguridad.Entities;
-using ModuloSeguridad.Services.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ModuloSeguridad.Services
 {
@@ -15,12 +10,10 @@ namespace ModuloSeguridad.Services
     {
         private readonly ILogger logger;
         private readonly ModuloSeguridadContext context;
-        protected readonly LogHelper logHelper;
         public BaseService(ILogger logger, ModuloSeguridadContext context)
         {
             this.logger = logger;
             this.context = context;
-            logHelper = new LogHelper(logger);
         }
 
         // To detect redundant calls

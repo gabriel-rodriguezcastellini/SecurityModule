@@ -1,27 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModuloSeguridad.Entities;
-using ModuloSeguridad.Frontend.Models;
-using ModuloSeguridad.Services.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
     public class BaseController : Controller
     {
         protected readonly ILogger<BaseController> logger;
-        protected readonly ModuloSeguridadContext context;
-        protected readonly LogHelper logHelper;
-        public BaseController(ILogger<BaseController> logger, ModuloSeguridadContext context)
+        public BaseController(ILogger<BaseController> logger)
         {
             this.logger = logger;
-            this.context = context;
-            logHelper = new LogHelper(logger);
-        }        
+        }
     }
 }
