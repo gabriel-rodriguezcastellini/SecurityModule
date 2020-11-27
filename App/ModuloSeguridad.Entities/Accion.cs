@@ -13,12 +13,7 @@ namespace ModuloSeguridad.Entities
         [MaxLength(50)]
         [MinLength(3)]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Requerido))]
-        public string Nombre { get; set; }
-
-        public int FormularioId { get; set; }
-
-        [ForeignKey(nameof(FormularioId))]
-        public Formulario Formulario { get; set; }
+        public string Nombre { get; set; }        
 
         public List<GrupoAccion> GrupoAcciones { get; set; }        
     }

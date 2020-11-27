@@ -13,7 +13,6 @@ namespace ModuloSeguridad.Entities
         public DbSet<Accion> Acciones { get; set; }
         public DbSet<EstadoGrupo> EstadoGrupos { get; set; }
         public DbSet<EstadoUsuario> EstadoUsuarios { get; set; }
-        public DbSet<Formulario> Formularios { get; set; }
         public DbSet<Grupo> Grupos { get; set; }
         public DbSet<GrupoAccion> GrupoAcciones { get; set; }
         public DbSet<Modulo> Modulos { get; set; }
@@ -32,11 +31,7 @@ namespace ModuloSeguridad.Entities
 
             modelBuilder.Entity<EstadoUsuario>()
                 .HasIndex(eu => eu.Nombre)
-                .IsUnique();
-
-            modelBuilder.Entity<Formulario>()
-                .HasIndex(f => f.Nombre)
-                .IsUnique();
+                .IsUnique();            
 
             modelBuilder.Entity<Grupo>()
                 .HasIndex(g => g.Codigo)
@@ -53,13 +48,7 @@ namespace ModuloSeguridad.Entities
             modelBuilder.Entity<GrupoAccion>()
                 .HasOne(ga => ga.Accion)
                 .WithMany(a => a.GrupoAcciones)
-                .HasForeignKey(ga => ga.AccionId);
-
-            modelBuilder.Entity<Modulo>()                
-                .HasOne(m => m.ModuloPadre)
-                .WithMany(m => m.ModulosHijos)
-                .HasForeignKey(m => m.ModuloPadreId)
-                .IsRequired(false);
+                .HasForeignKey(ga => ga.AccionId);            
 
             modelBuilder.Entity<Modulo>()
                 .HasIndex(m => m.Nombre)

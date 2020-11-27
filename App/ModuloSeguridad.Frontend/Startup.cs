@@ -40,20 +40,22 @@ namespace ModuloSeguridad.Frontend
                 return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = string.Concat("/",nameof(UsuariosController.Login));
-                options.AccessDeniedPath = string.Concat("/",nameof(ErrorController.Forbidden));
-            });
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            //.AddCookie(options =>
+            //{
+            //    options.LoginPath = string.Concat("/",nameof(UsuariosController.Login));
+            //    options.AccessDeniedPath = string.Concat("/",nameof(ErrorController.Forbidden));
+            //});
 
-            services.AddControllers(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            });
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //services.AddControllers(config =>
+            //{
+            //    var policy = new AuthorizationPolicyBuilder()
+            //                     .RequireAuthenticatedUser()
+            //                     .Build();
+            //    config.Filters.Add(new AuthorizeFilter(policy));
+            //});            
 
             services.AddMvc();
         }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class BaseController : Controller
     {
         protected readonly ILogger<BaseController> logger;
