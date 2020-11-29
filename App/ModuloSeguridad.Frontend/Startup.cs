@@ -30,7 +30,7 @@ namespace ModuloSeguridad.Frontend
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
                     Configuration.GetConnectionString(nameof(ModuloSeguridadContext))));            
@@ -40,24 +40,27 @@ namespace ModuloSeguridad.Frontend
                 return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
             });
 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //services.AddControllersWithViews();
+
+            services.AddControllers(config =>
+            {
+                config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build()));
+            });
+
+            services.AddMvc();
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             //.AddCookie(options =>
             //{
             //    options.LoginPath = string.Concat("/",nameof(UsuariosController.Login));
             //    options.AccessDeniedPath = string.Concat("/",nameof(ErrorController.Forbidden));
             //});
-
-            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            //services.AddControllers(config =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                     .RequireAuthenticatedUser()
-            //                     .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
-            //});            
-
-            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,16 +81,16 @@ namespace ModuloSeguridad.Frontend
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCookiePolicy(new CookiePolicyOptions() { MinimumSameSitePolicy = SameSiteMode.Strict });
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
 
