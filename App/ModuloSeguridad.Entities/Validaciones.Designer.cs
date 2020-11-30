@@ -63,9 +63,9 @@ namespace ModuloSeguridad.Entities {
         /// <summary>
         ///   Busca una cadena traducida similar a Este dato es requerido.
         /// </summary>
-        public static string Requerido {
+        public static string Required {
             get {
-                return ResourceManager.GetString("Requerido", resourceCulture);
+                return ResourceManager.GetString("Required", resourceCulture);
             }
         }
     }

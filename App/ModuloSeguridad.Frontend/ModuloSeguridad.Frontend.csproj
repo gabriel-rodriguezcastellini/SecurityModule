@@ -38,11 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModuloSeguridad.Services\ModuloSeguridad.Services.csproj" />
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\lib\" />
+    <ProjectReference Include="..\ModuloSeguridad.Services\ModuloSeguridad.Services.csproj" />
   </ItemGroup>
 
 </Project>

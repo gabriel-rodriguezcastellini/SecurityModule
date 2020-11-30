@@ -1,23 +1,14 @@
 ﻿using ModuloSeguridad.Entities;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Models.Account
 {
-    public class LoginViewModel
+    public class AccountLoginViewModel
     {
-        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Requerido),AllowEmptyStrings =false)]
-        [MaxLength(50)]
-        [MinLength(3)]
         [Display(Name = nameof(Usuario))]
         public string NombreUsuario { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        [MinLength(3)]
+        
+        [DataType(DataType.Password)]
         public string Clave { get; set; }
 
         public Usuario ConvertirUsuario()

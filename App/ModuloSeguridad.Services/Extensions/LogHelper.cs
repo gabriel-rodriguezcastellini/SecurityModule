@@ -12,12 +12,12 @@ namespace Microsoft.Extensions.Logging
 
         public static void InicioMetodo(this ILogger logger, [CallerMemberName] string methodName = "")
         {
-            logger.LogInformation(string.Format(string.Concat(asterisks.PadRight(1,' '), methodName, " Inicio ", asterisks)));
+            logger.LogInformation(string.Format(string.Concat(asterisks, " ", methodName, " Inicio ", asterisks)));
         }
 
         public static void FinMetodo(this ILogger logger, [CallerMemberName] string methodName = "")
         {
-            logger.LogInformation(string.Format(string.Concat(asterisks.PadRight(1, ' '), methodName, " Fin ", asterisks)));
+            logger.LogInformation(string.Format(string.Concat(asterisks, " ", methodName, " Fin ", asterisks)));
         }
     }
 }

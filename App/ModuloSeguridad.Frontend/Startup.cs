@@ -15,6 +15,7 @@ using ModuloSeguridad.Frontend.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using ModuloSeguridad.Frontend.Authorization;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -45,8 +46,6 @@ namespace ModuloSeguridad.Frontend
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //services.AddControllersWithViews();
-
             services.AddControllers(config =>
             {
                 config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
@@ -54,13 +53,9 @@ namespace ModuloSeguridad.Frontend
                                  .Build()));
             });
 
+            services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>();
+
             services.AddMvc();
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            //.AddCookie(options =>
-            //{
-            //    options.LoginPath = string.Concat("/",nameof(UsuariosController.Login));
-            //    options.AccessDeniedPath = string.Concat("/",nameof(ErrorController.Forbidden));
-            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

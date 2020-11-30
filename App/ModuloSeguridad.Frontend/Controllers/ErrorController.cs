@@ -9,22 +9,24 @@ namespace ModuloSeguridad.Frontend.Controllers
 {
     public class ErrorController : Controller
     {
+        [AllowAnonymous]
         [Route(nameof(ErrorHandler))]
         public IActionResult ErrorHandler()
         {
-            return RedirectToAction(nameof(Error));
+            return RedirectToAction(nameof(Error), nameof(Error));
         }
 
+        [AllowAnonymous]
         [Route(nameof(Error))]
         public IActionResult Error()
         {
-            return View();
+            return View("Error");
         }
 
-        [Route(nameof(Forbidden))]
-        public IActionResult Forbidden()
-        {
-            return View();
-        }
+        //[Route(nameof(Forbidden))]
+        //public IActionResult Forbidden()
+        //{
+        //    return View();
+        //}
     }
 }
