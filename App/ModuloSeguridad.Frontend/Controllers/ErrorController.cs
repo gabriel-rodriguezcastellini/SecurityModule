@@ -23,10 +23,11 @@ namespace ModuloSeguridad.Frontend.Controllers
             return View("Error");
         }
 
-        //[Route(nameof(Forbidden))]
-        //public IActionResult Forbidden()
-        //{
-        //    return View();
-        //}
+        [Route(nameof(Error403))]
+        [AllowAnonymous]
+        public IActionResult Error403()
+        {
+            return View();
+        }
     }
 }

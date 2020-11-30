@@ -20,7 +20,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             //if (User.Identity.IsAuthenticated)
             //{
-            //    return Forbid();
+            //    return RedirectToAction(nameof(ErrorController.Error403), nameof(ErrorController.Error));
             //}
             return View(new UsuarioViewModel() {Nombre = "Gabriel" });
         }
