@@ -11,3 +11,8 @@
 {
     <h1>Autenticado!</h1>
 }
+
+@*@if (TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ErrorMessage)] != null)
+{
+    @Html.Raw(TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ErrorMessage)])
+}*@

@@ -8,10 +8,10 @@ namespace ModuloSeguridad.Frontend.Authorization
 {
     public static class Acciones
     {
-        public static OperationAuthorizationRequirement Crear = new OperationAuthorizationRequirement { Name = Constantes.AccionCrear };
-        public static OperationAuthorizationRequirement Leer = new OperationAuthorizationRequirement { Name = Constantes.AccionLeer };
-        public static OperationAuthorizationRequirement Actualizar = new OperationAuthorizationRequirement { Name = Constantes.AccionActualizar };
-        public static OperationAuthorizationRequirement Eliminar = new OperationAuthorizationRequirement { Name = Constantes.AccionEliminar };
+        public static readonly OperationAuthorizationRequirement Crear = new OperationAuthorizationRequirement { Name = Constantes.AccionCrear };
+        public static readonly OperationAuthorizationRequirement Leer = new OperationAuthorizationRequirement { Name = Constantes.AccionLeer };
+        public static readonly OperationAuthorizationRequirement Actualizar = new OperationAuthorizationRequirement { Name = Constantes.AccionActualizar };
+        public static readonly OperationAuthorizationRequirement Eliminar = new OperationAuthorizationRequirement { Name = Constantes.AccionEliminar };
     }
 
     public class Constantes

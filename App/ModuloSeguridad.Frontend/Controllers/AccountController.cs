@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Frontend.Models.Account;
 using ModuloSeguridad.Services;
 using System;
@@ -22,8 +23,10 @@ namespace ModuloSeguridad.Frontend.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
             ReturnUrl = returnUrl;
             return View();
         }
@@ -31,9 +34,27 @@ namespace ModuloSeguridad.Frontend.Controllers
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(AccountLoginViewModel model, string returnUrl = null)
-        {
-            logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
-            ReturnUrl = returnUrl;
+        {            
+            try
+            {
+                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
+                logger.LogInformation("Usuario: " + model.NombreUsuario);
+                ReturnUrl = returnUrl;
+                if (!ModelState.IsValid) return View(model);
+                
+
+
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error tratando de autenticar usuario {0}", model.NombreUsuario);
+            }
+            finally
+            {
+                logger.FinMetodo(MethodBase.GetCurrentMethod().Name);
+            }
+
+            
 
             var authProperties = new AuthenticationProperties
             {
@@ -68,7 +89,6 @@ namespace ModuloSeguridad.Frontend.Controllers
                         new Claim(ClaimTypes.Role, "Administrator"),
                     }, CookieAuthenticationDefaults.AuthenticationScheme)), authProperties);
             
-
             return LocalRedirect(Url.GetLocalUrl(returnUrl));
         }
     }

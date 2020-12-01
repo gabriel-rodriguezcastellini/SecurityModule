@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ModuloSeguridad.Entities.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,11 @@ namespace ModuloSeguridad.Entities
         public ModuloSeguridadContext(DbContextOptions options) : base(options) { }
 
         public DbSet<Accion> Acciones { get; set; }
+        public DbSet<AccionModulo> AccionModulos { get; set; }
         public DbSet<EstadoGrupo> EstadoGrupos { get; set; }
         public DbSet<EstadoUsuario> EstadoUsuarios { get; set; }
         public DbSet<Grupo> Grupos { get; set; }
-        public DbSet<GrupoAccion> GrupoAcciones { get; set; }
+        public DbSet<GrupoAccionModulo> GrupoAccionModulos { get; set; }
         public DbSet<Modulo> Modulos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }                                
         public DbSet<UsuarioGrupo> UsuarioGrupos { get; set; }
@@ -24,6 +26,16 @@ namespace ModuloSeguridad.Entities
             modelBuilder.Entity<Accion>()
                 .HasIndex(a => a.Nombre)
                 .IsUnique();
+
+            modelBuilder.Entity<AccionModulo>()
+                .HasOne(am => am.Accion)
+                .WithMany(am => am.AccionModulos)
+                .HasForeignKey(am => am.AccionId);
+
+            modelBuilder.Entity<AccionModulo>()
+                .HasOne(am => am.Modulo)
+                .WithMany(am => am.AccionModulos)
+                .HasForeignKey(am => am.ModuloId);
 
             modelBuilder.Entity<EstadoGrupo>()
                 .HasIndex(eg => eg.Nombre)
@@ -37,18 +49,18 @@ namespace ModuloSeguridad.Entities
                 .HasIndex(g => g.Codigo)
                 .IsUnique();
 
-            modelBuilder.Entity<GrupoAccion>()
-                .HasKey(ga => new { ga.GrupoId, ga.AccionId });
+            modelBuilder.Entity<GrupoAccionModulo>()
+                .HasKey(gam => new { gam.GrupoId, gam.AccionModuloId });
 
-            modelBuilder.Entity<GrupoAccion>()
-                .HasOne(ga => ga.Grupo)
-                .WithMany(g => g.GrupoAcciones)
-                .HasForeignKey(ga => ga.GrupoId);
+            modelBuilder.Entity<GrupoAccionModulo>()
+                .HasOne(gam => gam.Grupo)
+                .WithMany(gam => gam.GrupoAccionModulos)
+                .HasForeignKey(gam => gam.GrupoId);
 
-            modelBuilder.Entity<GrupoAccion>()
-                .HasOne(ga => ga.Accion)
-                .WithMany(a => a.GrupoAcciones)
-                .HasForeignKey(ga => ga.AccionId);            
+            modelBuilder.Entity<GrupoAccionModulo>()
+                .HasOne(gam => gam.AccionModulo)
+                .WithMany(gam => gam.GrupoAccionModulos)
+                .HasForeignKey(gam => gam.AccionModuloId);
 
             modelBuilder.Entity<Modulo>()
                 .HasIndex(m => m.Nombre)

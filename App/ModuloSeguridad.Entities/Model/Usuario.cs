@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace ModuloSeguridad.Entities
+namespace ModuloSeguridad.Entities.Model
 {
     public class Usuario : BaseEntity
     {

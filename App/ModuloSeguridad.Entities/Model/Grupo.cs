@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace ModuloSeguridad.Entities
+namespace ModuloSeguridad.Entities.Model
 {
     public class Grupo : BaseEntity
     {
@@ -26,6 +26,6 @@ namespace ModuloSeguridad.Entities
 
         public List<UsuarioGrupo> UsuarioGrupos { get; set; }
 
-        public List<GrupoAccion> GrupoAcciones { get; set; }
+        public List<GrupoAccionModulo> GrupoAccionModulos { get; set; }
     }
 }

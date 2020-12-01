@@ -14,15 +14,14 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             this.logger = logger;
             AuthorizationService = authorizationService;
-            if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                ModelState.AddModelError(string.Empty, ErrorMessage);
-            }
         }
 
         protected string ReturnUrl { get; set; }
 
         [TempData]
         public string ErrorMessage { get; set; }
+
+        [TempData]
+        public string InfoMessage { get; set; }
     }
 }

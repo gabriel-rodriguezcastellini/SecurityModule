@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModuloSeguridad.Entities
+namespace ModuloSeguridad.Entities.Model
 {
     public class BaseEntity
     {

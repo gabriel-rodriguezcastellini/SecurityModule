@@ -17,7 +17,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         }
 
         public IActionResult Index()
-        {
+        {            
             //if (User.Identity.IsAuthenticated)
             //{
             //    return RedirectToAction(nameof(ErrorController.Error403), nameof(ErrorController.Error));

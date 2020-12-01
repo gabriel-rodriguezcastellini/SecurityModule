@@ -1,4 +1,4 @@
-﻿using ModuloSeguridad.Entities;
+﻿using ModuloSeguridad.Entities.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModuloSeguridad.Frontend.Models.Account

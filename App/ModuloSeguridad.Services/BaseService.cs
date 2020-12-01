@@ -8,8 +8,8 @@ namespace ModuloSeguridad.Services
 {
     public class BaseService : IDisposable
     {
-        private readonly ILogger logger;
-        private readonly ModuloSeguridadContext context;
+        protected readonly ILogger logger;
+        protected readonly ModuloSeguridadContext context;
         public BaseService(ILogger logger, ModuloSeguridadContext context)
         {
             this.logger = logger;
