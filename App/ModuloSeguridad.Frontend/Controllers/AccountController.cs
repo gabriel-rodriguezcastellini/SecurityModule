@@ -47,7 +47,7 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Error tratando de autenticar usuario {0}", model.NombreUsuario);
+                logger.LogError(e, "Ocurrió un error en Login");
             }
             finally
             {
