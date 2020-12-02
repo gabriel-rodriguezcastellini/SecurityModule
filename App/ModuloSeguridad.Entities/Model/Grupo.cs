@@ -13,18 +13,12 @@ namespace ModuloSeguridad.Entities.Model
         [MinLength(3)]
         [MaxLength(50)]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
-        public string Codigo { get; set; }
-
-        [MinLength(3)]
-        [MaxLength(50)]
-        public string Descripcion { get; set; }
+        public string Codigo { get; set; }        
 
         public int EstadoGrupoId { get; set; }
 
         [ForeignKey(nameof(EstadoGrupoId))]
         public EstadoGrupo EstadoGrupo { get; set; }
-
-        public List<UsuarioGrupo> UsuarioGrupos { get; set; }
 
         public List<GrupoAccionModulo> GrupoAccionModulos { get; set; }
     }

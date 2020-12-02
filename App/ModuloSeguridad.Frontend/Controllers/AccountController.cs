@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Frontend.Models.Account;
 using ModuloSeguridad.Services;
@@ -17,9 +18,10 @@ namespace ModuloSeguridad.Frontend.Controllers
 {
     public class AccountController : BaseController
     {
-        public AccountController(ILogger<AccountController> logger, IAuthorizationService authorizationService) : base(logger, authorizationService)
+        private readonly UsuarioService usuarioService;
+        public AccountController(ILogger<AccountController> logger, IAuthorizationService authorizationService, UsuarioService usuarioService) : base(logger, authorizationService)
         {
-            
+            this.usuarioService = usuarioService;
         }
 
         [AllowAnonymous]
@@ -28,26 +30,32 @@ namespace ModuloSeguridad.Frontend.Controllers
             await HttpContext.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
             ReturnUrl = returnUrl;
-            return View();
+            return View(new AccountLoginViewModel());
         }
 
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Login(AccountLoginViewModel model, string returnUrl = null)
-        {            
+        {
             try
             {
                 logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
                 logger.LogInformation("Usuario: " + model.NombreUsuario);
+                Usuario usuario;
                 ReturnUrl = returnUrl;
                 if (!ModelState.IsValid) return View(model);
-                
-
-
+                usuario = usuarioService.GetUsuario(model.NombreUsuario, model.Clave);
+                if (usuario == null)
+                {
+                    model.ErrorMessage = "Usuario inexistente.";
+                    return View(model);
+                }
+                return View(model);
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Ocurrió un error en Login");
+                return View(model);
             }
             finally
             {
@@ -56,40 +64,40 @@ namespace ModuloSeguridad.Frontend.Controllers
 
             
 
-            var authProperties = new AuthenticationProperties
-            {
-                //AllowRefresh = <bool>,
-                // Refreshing the authentication session should be allowed.
+            //var authProperties = new AuthenticationProperties
+            //{
+            //    //AllowRefresh = <bool>,
+            //    // Refreshing the authentication session should be allowed.
 
-                ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(10)
-                // The time at which the authentication ticket expires. A 
-                // value set here overrides the ExpireTimeSpan option of 
-                // CookieAuthenticationOptions set with AddCookie.
+            //    ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(10)
+            //    // The time at which the authentication ticket expires. A 
+            //    // value set here overrides the ExpireTimeSpan option of 
+            //    // CookieAuthenticationOptions set with AddCookie.
 
-                //IsPersistent = true,
-                // Whether the authentication session is persisted across 
-                // multiple requests. When used with cookies, controls
-                // whether the cookie's lifetime is absolute (matching the
-                // lifetime of the authentication ticket) or session-based.
+            //    //IsPersistent = true,
+            //    // Whether the authentication session is persisted across 
+            //    // multiple requests. When used with cookies, controls
+            //    // whether the cookie's lifetime is absolute (matching the
+            //    // lifetime of the authentication ticket) or session-based.
 
-                //IssuedUtc = <DateTimeOffset>,
-                // The time at which the authentication ticket was issued.
+            //    //IssuedUtc = <DateTimeOffset>,
+            //    // The time at which the authentication ticket was issued.
 
-                //RedirectUri = <string>
-                // The full path or absolute URI to be used as an http 
-                // redirect response value.
-            };
+            //    //RedirectUri = <string>
+            //    // The full path or absolute URI to be used as an http 
+            //    // redirect response value.
+            //};
 
-            await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(new ClaimsIdentity(
-                    new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, model.NombreUsuario),
-                        new Claim(ClaimTypes.Role, "Administrator"),
-                    }, CookieAuthenticationDefaults.AuthenticationScheme)), authProperties);
+            //await HttpContext.SignInAsync(
+            //        CookieAuthenticationDefaults.AuthenticationScheme,
+            //        new ClaimsPrincipal(new ClaimsIdentity(
+            //        new List<Claim>
+            //        {
+            //            new Claim(ClaimTypes.Name, model.NombreUsuario),
+            //            new Claim(ClaimTypes.Role, "Administrator"),
+            //        }, CookieAuthenticationDefaults.AuthenticationScheme)), authProperties);
             
-            return LocalRedirect(Url.GetLocalUrl(returnUrl));
+            //return LocalRedirect(Url.GetLocalUrl(returnUrl));
         }
     }
 }

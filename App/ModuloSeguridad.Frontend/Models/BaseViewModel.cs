@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Models
 {
-    public class UsuarioViewModel : BaseViewModel
+    public class BaseViewModel
     {
-        //public string Nombre { get; set; }
+        public string ErrorMessage { get; set; }
+        public string InfoMessage { get; set; }
     }
 }

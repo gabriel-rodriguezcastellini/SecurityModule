@@ -43,7 +43,7 @@ namespace ModuloSeguridad.Entities
 
             modelBuilder.Entity<EstadoUsuario>()
                 .HasIndex(eu => eu.Nombre)
-                .IsUnique();            
+                .IsUnique();
 
             modelBuilder.Entity<Grupo>()
                 .HasIndex(g => g.Codigo)
@@ -64,7 +64,7 @@ namespace ModuloSeguridad.Entities
 
             modelBuilder.Entity<Modulo>()
                 .HasIndex(m => m.Nombre)
-                .IsUnique();
+                .IsUnique();            
 
             modelBuilder.Entity<UsuarioGrupo>()
                 .HasKey(ug => new { ug.NombreUsuario, ug.GrupoId });
@@ -73,11 +73,6 @@ namespace ModuloSeguridad.Entities
                 .HasOne(ug => ug.Usuario)
                 .WithMany(u => u.UsuarioGrupos)
                 .HasForeignKey(ug => ug.NombreUsuario);
-
-            modelBuilder.Entity<UsuarioGrupo>()
-                .HasOne(ug => ug.Grupo)
-                .WithMany(g => g.UsuarioGrupos)
-                .HasForeignKey(ug => ug.GrupoId);            
         }
 
         public override int SaveChanges()

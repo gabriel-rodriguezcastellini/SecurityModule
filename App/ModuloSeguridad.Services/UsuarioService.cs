@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services.Common;
-using ModuloSeguridad.Services.Helpers;
+using NETCore.Encrypt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,17 +20,22 @@ namespace ModuloSeguridad.Services
             
         }
 
-        public async Task<Usuario> GetUsuarioAsync(string nombreUsuario, string clave)
+        public Usuario GetUsuario(string nombreUsuario, string clave)
         {
             try
             {
-                logger.InicioMetodo("GetUsuarioAsync");
+                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
                 logger.LogInformation("nombreUsuario: " + nombreUsuario);
-                var hashHelper = new HashHelper();
-                var usuario = context.Usuarios.FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString());
+                var usuario = context.Usuarios
+                    .Include(u=>u.UsuarioGrupos)
+                    .ThenInclude(ug=>ug.Grupo)
+                    .ThenInclude(g=>g.GrupoAccionModulos)
+                    .ThenInclude(gam=>gam.AccionModulo)
+                    .ThenInclude(am=>am.Accion)
+                    .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString() && !u.Eliminado);
                 logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : "encontrado"));
                 if (usuario == null) return null;
-                if (!hashHelper.CompareHash(clave, hashHelper.GenerateHash(clave))) return null;
+                if (EncryptProvider.Md5(clave) != usuario.Clave) return null;
                 return usuario;
             }
             catch (Exception e)
@@ -38,7 +45,7 @@ namespace ModuloSeguridad.Services
             }
             finally
             {
-                logger.FinMetodo("GetUsuarioAsync");
+                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
             }
         }
     }

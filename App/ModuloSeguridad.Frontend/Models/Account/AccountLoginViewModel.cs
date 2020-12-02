@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModuloSeguridad.Frontend.Models.Account
 {
-    public class AccountLoginViewModel
+    public class AccountLoginViewModel : BaseViewModel
     {
         [Display(Name = nameof(Usuario))]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]

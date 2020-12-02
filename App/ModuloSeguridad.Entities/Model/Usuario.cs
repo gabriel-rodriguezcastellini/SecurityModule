@@ -24,7 +24,6 @@ namespace ModuloSeguridad.Entities.Model
         public string Apellido { get; set; }
 
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
-        [MaxLength(50)]
         [MinLength(3)]
         public string Clave { get; set; }
 
