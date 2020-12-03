@@ -7,6 +7,6 @@ namespace ModuloSeguridad.Frontend.Models
 {
     public class UsuarioViewModel : BaseViewModel
     {
-        //public string Nombre { get; set; }
+        public string NombreUsuario { get; set; }
     }
 }

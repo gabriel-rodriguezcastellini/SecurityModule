@@ -1,18 +1,19 @@
 ﻿@model UsuarioViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @{
     ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
 @if ((await AuthorizationService.AuthorizeAsync(User, Model, Acciones.Eliminar)).Succeeded)
 {
     <h1>Autenticado!</h1>
 }
 
-@*@if (TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ErrorMessage)] != null)
+@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
 {
-    @Html.Raw(TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ErrorMessage)])
-}*@
+    <div class="row">
+        <div class="col-md-12">
+            <p>Autenticado 2!</p>
+        </div>
+    </div>
+}

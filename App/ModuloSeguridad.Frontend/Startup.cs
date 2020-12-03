@@ -53,7 +53,10 @@ namespace ModuloSeguridad.Frontend
                                  .Build()));
             });
 
-            services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>();
+            services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>((container) =>
+            {
+                return new CustomAuthorizationHandler(container.GetRequiredService<UsuarioService>());
+            });
 
             services.AddMvc();
         }

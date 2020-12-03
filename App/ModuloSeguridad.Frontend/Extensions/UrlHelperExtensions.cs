@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using ModuloSeguridad.Frontend.Controllers;
 using System;
@@ -13,7 +14,7 @@ namespace Microsoft.AspNetCore.Mvc
         {
             if (!urlHelper.IsLocalUrl(localUrl))
             {
-                return urlHelper.Action(new UrlActionContext() { Action = nameof(HomeController.Index), Controller = nameof(HomeController)});
+                return urlHelper.Content("/");
             }
 
             return localUrl;

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities.Model;
+using ModuloSeguridad.Frontend.Authorization;
 using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Frontend.Models.Account;
 using ModuloSeguridad.Services;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,10 @@ namespace ModuloSeguridad.Frontend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
+            if (HttpContext.User?.Identity?.IsAuthenticated == true)
+            {                
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
             await HttpContext.SignOutAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme);
             ReturnUrl = returnUrl;
@@ -42,6 +48,8 @@ namespace ModuloSeguridad.Frontend.Controllers
                 logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
                 logger.LogInformation("Usuario: " + model.NombreUsuario);
                 Usuario usuario;
+                List<Claim> claims;
+                ClaimsIdentity claimsIdentity;
                 ReturnUrl = returnUrl;
                 if (!ModelState.IsValid) return View(model);
                 usuario = usuarioService.GetUsuario(model.NombreUsuario, model.Clave);
@@ -49,8 +57,22 @@ namespace ModuloSeguridad.Frontend.Controllers
                 {
                     model.ErrorMessage = "Usuario inexistente.";
                     return View(model);
-                }
-                return View(model);
+                }                
+                claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, usuario.NombreUsuario),
+                    new Claim(ClaimTypes.Name, usuario.Nombre),
+                    new Claim(ClaimTypes.Surname, usuario.Apellido),
+                    new Claim(ClaimTypes.Email, usuario.Mail)
+                };
+                claimsIdentity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);                
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+                logger.LogInformation("Usuario {usuario} inició sesión a las {tiempo}.",
+                    usuario.NombreUsuario, DateTime.UtcNow);
+                return LocalRedirect(Url.GetLocalUrl(returnUrl));
             }
             catch (Exception e)
             {
@@ -60,44 +82,8 @@ namespace ModuloSeguridad.Frontend.Controllers
             finally
             {
                 logger.FinMetodo(MethodBase.GetCurrentMethod().Name);
+                usuarioService?.Dispose();
             }
-
-            
-
-            //var authProperties = new AuthenticationProperties
-            //{
-            //    //AllowRefresh = <bool>,
-            //    // Refreshing the authentication session should be allowed.
-
-            //    ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(10)
-            //    // The time at which the authentication ticket expires. A 
-            //    // value set here overrides the ExpireTimeSpan option of 
-            //    // CookieAuthenticationOptions set with AddCookie.
-
-            //    //IsPersistent = true,
-            //    // Whether the authentication session is persisted across 
-            //    // multiple requests. When used with cookies, controls
-            //    // whether the cookie's lifetime is absolute (matching the
-            //    // lifetime of the authentication ticket) or session-based.
-
-            //    //IssuedUtc = <DateTimeOffset>,
-            //    // The time at which the authentication ticket was issued.
-
-            //    //RedirectUri = <string>
-            //    // The full path or absolute URI to be used as an http 
-            //    // redirect response value.
-            //};
-
-            //await HttpContext.SignInAsync(
-            //        CookieAuthenticationDefaults.AuthenticationScheme,
-            //        new ClaimsPrincipal(new ClaimsIdentity(
-            //        new List<Claim>
-            //        {
-            //            new Claim(ClaimTypes.Name, model.NombreUsuario),
-            //            new Claim(ClaimTypes.Role, "Administrator"),
-            //        }, CookieAuthenticationDefaults.AuthenticationScheme)), authProperties);
-            
-            //return LocalRedirect(Url.GetLocalUrl(returnUrl));
         }
     }
 }

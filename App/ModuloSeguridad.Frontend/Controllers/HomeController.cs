@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Frontend.Models;
@@ -18,10 +21,6 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         public IActionResult Index()
         {
-            //if (User.Identity.IsAuthenticated)
-            //{
-            //    return RedirectToAction(nameof(ErrorController.Error403), nameof(ErrorController.Error));
-            //}
             return View(new UsuarioViewModel());
         }
     }
