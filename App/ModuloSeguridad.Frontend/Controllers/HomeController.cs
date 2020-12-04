@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModuloSeguridad.Frontend.Authorization;
 using ModuloSeguridad.Frontend.Models;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
+    [Authorize(nameof(UserAuthorizationHandler))]
     public class HomeController : BaseController
     {
         public HomeController(ILogger<HomeController> logger, IAuthorizationService authorizationService) : base(logger, authorizationService)
@@ -21,7 +23,7 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         public IActionResult Index()
         {
-            return View(new UsuarioViewModel());
+            return View(Cookie.GetUsuarioViewModel(HttpContext));
         }
     }
 }

@@ -1,8 +1,22 @@
-﻿@model UsuarioViewModel
+﻿@using Microsoft.Extensions.Configuration
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@inject IConfiguration IConfiguration
+@model UsuarioViewModel
 @{
     ViewData["Title"] = "Inicio";
 }
+
+
+<div class="row">
+    <div class="flex-center flex-column col">
+        <h1 class="animated fadeIn mb-2">@Html.Raw(IConfiguration["Properties:Application"])</h1>
+
+        <h5 class="animated fadeIn mb-1">Gracias por usar nuestro producto. Nos alegra que esté con nosotros.</h5>
+
+        <p class="animated fadeIn text-muted">Equipo de @Html.Raw(IConfiguration["Properties:Application"])</p>
+    </div>
+</div>
+
 
 @if ((await AuthorizationService.AuthorizeAsync(User, Model, Acciones.Eliminar)).Succeeded)
 {

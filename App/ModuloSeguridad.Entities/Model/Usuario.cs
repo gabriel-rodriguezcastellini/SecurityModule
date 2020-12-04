@@ -30,6 +30,7 @@ namespace ModuloSeguridad.Entities.Model
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
         [MaxLength(50)]
         [MinLength(3)]
+        [DataType(DataType.EmailAddress)]
         public string Mail { get; set; }
 
         public int EstadoUsuarioId { get; set; }

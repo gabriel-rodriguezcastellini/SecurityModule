@@ -26,7 +26,11 @@ namespace ModuloSeguridad.Frontend.Controllers
             this.usuarioService = usuarioService;
         }
 
-        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             if (HttpContext.User?.Identity?.IsAuthenticated == true)
@@ -40,7 +44,6 @@ namespace ModuloSeguridad.Frontend.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Login(AccountLoginViewModel model, string returnUrl = null)
         {
             try
@@ -53,6 +56,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                 ReturnUrl = returnUrl;
                 if (!ModelState.IsValid) return View(model);
                 usuario = usuarioService.GetUsuario(model.NombreUsuario, model.Clave);
+                logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : usuario.NombreUsuario + "encontrado"));
                 if (usuario == null)
                 {
                     model.ErrorMessage = "Usuario inexistente.";

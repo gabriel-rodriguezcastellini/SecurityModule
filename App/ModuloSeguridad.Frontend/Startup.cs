@@ -46,19 +46,28 @@ namespace ModuloSeguridad.Frontend
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddControllers(config =>
+            services.AddControllersWithViews();
+
+            services.AddAuthorization(options =>
             {
-                config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build()));
+                options.AddPolicy(nameof(UserAuthorizationHandler), policy => policy.Requirements.Add(new UserRequirement()));
             });
 
-            services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>((container) =>
-            {
-                return new CustomAuthorizationHandler(container.GetRequiredService<UsuarioService>());
-            });
+            services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
 
-            services.AddMvc();
+            //services.AddMvc();
+
+            //services.AddControllers(config =>
+            //{
+            //    config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder()
+            //                     .RequireAuthenticatedUser()
+            //                     .Build()));
+            //});
+
+            //services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>((container) =>
+            //{
+            //    return new CustomAuthorizationHandler(container.GetRequiredService<UsuarioService>());
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

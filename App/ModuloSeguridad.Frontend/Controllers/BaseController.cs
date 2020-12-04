@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModuloSeguridad.Frontend.Authorization;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
-    [AutoValidateAntiforgeryToken]
+    [AutoValidateAntiforgeryToken]    
     public class BaseController : Controller
     {
         protected readonly ILogger<BaseController> logger;

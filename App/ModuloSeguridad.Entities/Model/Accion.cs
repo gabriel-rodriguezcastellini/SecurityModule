@@ -14,7 +14,7 @@ namespace ModuloSeguridad.Entities.Model
         [MinLength(3)]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
         public string Nombre { get; set; }        
-
+        
         public List<AccionModulo> AccionModulos { get; set; }
     }
 }

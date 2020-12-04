@@ -9,18 +9,9 @@ namespace ModuloSeguridad.Frontend.Models.Account
         [Display(Name = nameof(Usuario))]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
         public string NombreUsuario { get; set; }
-        
+
         [DataType(DataType.Password)]
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
         public string Clave { get; set; }
-
-        public Usuario ConvertirUsuario()
-        {
-            return new Usuario()
-            {
-                NombreUsuario = NombreUsuario,
-                Clave = Clave
-            };
-        }
     }
 }
