@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Frontend.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,8 @@ namespace ModuloSeguridad.Frontend.Authorization
                 NombreUsuario = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
                 Nombre = httpContext.User.FindFirst(ClaimTypes.Name)?.Value,
                 Apellido = httpContext.User.FindFirst(ClaimTypes.Surname)?.Value,
-                Mail = httpContext.User.FindFirst(ClaimTypes.Email)?.Value
+                Mail = httpContext.User.FindFirst(ClaimTypes.Email)?.Value,
+                AccionModulos = JsonConvert.DeserializeObject<List<AccionModulo>>(httpContext.User.FindFirst(ClaimTypes.UserData)?.Value)
             };
         }
     }

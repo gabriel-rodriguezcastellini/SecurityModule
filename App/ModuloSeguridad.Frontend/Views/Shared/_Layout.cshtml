@@ -1,5 +1,6 @@
 ﻿@using Microsoft.Extensions.Configuration
 @inject IConfiguration IConfiguration
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 <!DOCTYPE html>
 <html lang="es-ar">
 <head>
@@ -15,7 +16,7 @@
     <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
 </head>
 <body>
-    @*<header>
+    <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@IConfiguration["Properties:Application"]</a>
@@ -25,27 +26,34 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (HttpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated == true)
+                        {
+                            foreach (var item in Newtonsoft.Json.JsonConvert.DeserializeObject<List<ModuloSeguridad.Entities.Model.AccionModulo>>(User.FindFirst(System.Security.Claims.ClaimTypes.UserData)?.Value).Select(m => m.Modulo).Distinct())
+                            {
+                                @Html.Raw("<li class='nav-item'><a class='nav-link text-dark' href='" + Url.Action("Index", item.Nombre) + "'>" + item.Nombre + "</a></li>");
+                            }
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
-    </header>*@    
+    </header>
     <main role="main" class="pb-3 container">
         @RenderBody()
     </main>
-    
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; @DateTime.Now.Year - @Html.Raw(IConfiguration["Properties:Application"])
         </div>
     </footer>
+
+    <div role="alert" aria-live="assertive" aria-atomic="true" class="toast @TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ColorMessage)] text-white" data-delay="10000" style="position: fixed; z-index:999999; top:1rem; right:1rem">
+        <div class="toast-body">
+            <i class="@TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.SymbolMessage)] mr-2"></i>
+            @TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.InfoMessage)]
+        </div>
+    </div>
+
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/twitter-bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/mdbootstrap/js/mdb.min.js"></script>
@@ -53,7 +61,15 @@
     <script src="~/js/mvc-grid/mvc-grid.js"></script>
     <script>
         document.querySelectorAll(".mvc-grid").forEach(element => new MvcGrid(element));
-    </script>    
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
+    @if (TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.InfoMessage)] != null)
+    {
+        <script>
+            $(function () {
+                $('.toast').toast('show');
+            });
+        </script>
+    }
 </body>
 </html>

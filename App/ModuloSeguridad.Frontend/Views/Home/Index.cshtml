@@ -1,7 +1,5 @@
 ﻿@using Microsoft.Extensions.Configuration
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
 @inject IConfiguration IConfiguration
-@model UsuarioViewModel
 @{
     ViewData["Title"] = "Inicio";
 }
@@ -16,18 +14,3 @@
         <p class="animated fadeIn text-muted">Equipo de @Html.Raw(IConfiguration["Properties:Application"])</p>
     </div>
 </div>
-
-
-@if ((await AuthorizationService.AuthorizeAsync(User, Model, Acciones.Eliminar)).Succeeded)
-{
-    <h1>Autenticado!</h1>
-}
-
-@if (HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-{
-    <div class="row">
-        <div class="col-md-12">
-            <p>Autenticado 2!</p>
-        </div>
-    </div>
-}

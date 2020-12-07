@@ -10,8 +10,6 @@ namespace ModuloSeguridad.Frontend.Models
 {
     public class BaseViewModel
     {
-        public string ErrorMessage { get; set; }
-
-        public string InfoMessage { get; set; }        
+        public string InfoMessage { get; set; }
     }
 }

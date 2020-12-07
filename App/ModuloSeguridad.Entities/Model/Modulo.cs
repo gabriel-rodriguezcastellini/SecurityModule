@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -14,6 +15,7 @@ namespace ModuloSeguridad.Entities.Model
         [MinLength(3)]
         public string Nombre { get; set; }      
         
+        [JsonIgnore]
         public List<AccionModulo> AccionModulos { get; set; }
     }
 }

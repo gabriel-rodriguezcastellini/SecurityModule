@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Frontend.Authorization;
+using ModuloSeguridad.Frontend.Extensions;
 using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Frontend.Models.Account;
 using ModuloSeguridad.Services;
@@ -21,6 +22,7 @@ namespace ModuloSeguridad.Frontend.Controllers
     public class AccountController : BaseController
     {
         private readonly UsuarioService usuarioService;
+
         public AccountController(ILogger<AccountController> logger, IAuthorizationService authorizationService, UsuarioService usuarioService) : base(logger, authorizationService)
         {
             this.usuarioService = usuarioService;
@@ -34,7 +36,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             if (HttpContext.User?.Identity?.IsAuthenticated == true)
-            {                
+            {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             await HttpContext.SignOutAsync(
@@ -50,37 +52,43 @@ namespace ModuloSeguridad.Frontend.Controllers
             {
                 logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
                 logger.LogInformation("Usuario: " + model.NombreUsuario);
+                var accionModuloHelper = new AccionModuloHelper(logger);
                 Usuario usuario;
                 List<Claim> claims;
                 ClaimsIdentity claimsIdentity;
+                var accionModulos = new List<AccionModulo>();
                 ReturnUrl = returnUrl;
                 if (!ModelState.IsValid) return View(model);
                 usuario = usuarioService.GetUsuario(model.NombreUsuario, model.Clave);
                 logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : usuario.NombreUsuario + "encontrado"));
                 if (usuario == null)
                 {
-                    model.ErrorMessage = "Usuario inexistente.";
+                    model.InfoMessage = "Usuario inexistente.";
                     return View(model);
-                }                
+                }
+                accionModuloHelper.GuardarAccionesModulos(usuario.UsuarioGrupos, ref accionModulos); //carga las acciones/modulos para luego guardarlas en los claims
                 claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, usuario.NombreUsuario),
                     new Claim(ClaimTypes.Name, usuario.Nombre),
                     new Claim(ClaimTypes.Surname, usuario.Apellido),
-                    new Claim(ClaimTypes.Email, usuario.Mail)
+                    new Claim(ClaimTypes.Email, usuario.Mail),
+                    new Claim(ClaimTypes.UserData, JsonConvert.SerializeObject(accionModulos))
                 };
                 claimsIdentity = new ClaimsIdentity(
-                    claims, CookieAuthenticationDefaults.AuthenticationScheme);                
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
                 logger.LogInformation("Usuario {usuario} inició sesión a las {tiempo}.",
                     usuario.NombreUsuario, DateTime.UtcNow);
+                CargarNotificacion("Inicio de sesión exitoso", "success-color", "fas fa-check");
                 return LocalRedirect(Url.GetLocalUrl(returnUrl));
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Ocurrió un error en Login");
+                CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa - exclamation");
                 return View(model);
             }
             finally

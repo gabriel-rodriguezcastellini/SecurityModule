@@ -1,5 +1,6 @@
 ﻿using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModuloSeguridad.Frontend.Models
@@ -23,5 +24,9 @@ namespace ModuloSeguridad.Frontend.Models
         [MinLength(3)]
         [DataType(DataType.EmailAddress)]
         public string Mail { get; set; }
+
+        public List<AccionModulo> AccionModulos { get; set; }
+
+        public AccionModulo AccionModuloActual { get; set; }
     }
 }

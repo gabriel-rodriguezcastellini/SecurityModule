@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -18,7 +19,8 @@ namespace ModuloSeguridad.Entities.Model
 
         [ForeignKey(nameof(ModuloId))]
         public Modulo Modulo { get; set; }
-
+        
+        [JsonIgnore]
         public List<GrupoAccionModulo> GrupoAccionModulos { get; set; }
     }
 }

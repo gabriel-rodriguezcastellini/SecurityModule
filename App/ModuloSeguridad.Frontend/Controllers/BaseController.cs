@@ -10,6 +10,16 @@ namespace ModuloSeguridad.Frontend.Controllers
     {
         protected readonly ILogger<BaseController> logger;
         protected IAuthorizationService AuthorizationService { get; }
+        protected string ReturnUrl { get; set; }
+
+        [TempData]
+        public string InfoMessage { get; set; }
+
+        [TempData]
+        public string ColorMessage { get; set; }
+
+        [TempData]
+        public string SymbolMessage { get; set; }
 
         public BaseController(ILogger<BaseController> logger, IAuthorizationService authorizationService)
         {
@@ -17,12 +27,11 @@ namespace ModuloSeguridad.Frontend.Controllers
             AuthorizationService = authorizationService;
         }
 
-        protected string ReturnUrl { get; set; }
-
-        [TempData]
-        public string ErrorMessage { get; set; }
-
-        [TempData]
-        public string InfoMessage { get; set; }
+        protected void CargarNotificacion(string mensaje, string color, string simbolo)
+        {
+            InfoMessage = mensaje;
+            ColorMessage = color;
+            SymbolMessage = simbolo;
+        }
     }
 }

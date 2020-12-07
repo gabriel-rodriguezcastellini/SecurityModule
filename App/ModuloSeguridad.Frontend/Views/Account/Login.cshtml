@@ -10,7 +10,7 @@
         {
             @Html.AntiForgeryToken()
             <p class="h4 mb-4">Iniciar Sesión</p>            
-            <span class="text-danger">@Model.ErrorMessage</span>
+            <span class="text-danger">@Model.InfoMessage</span>
             <div class="form-group row">
                 <div class="col-2 my-auto text-left">
                     @Html.LabelFor(m => m.NombreUsuario)

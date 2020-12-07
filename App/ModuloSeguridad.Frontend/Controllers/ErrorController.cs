@@ -9,25 +9,22 @@ namespace ModuloSeguridad.Frontend.Controllers
 {
     public class ErrorController : Controller
     {
-        [AllowAnonymous]
         [Route(nameof(ErrorHandler))]
         public IActionResult ErrorHandler()
         {
             return RedirectToAction(nameof(Error), nameof(Error));
         }
 
-        [AllowAnonymous]
         [Route(nameof(Error))]
         public IActionResult Error()
         {
             return View("Error");
         }
 
-        [Route(nameof(Error403))]
-        [AllowAnonymous]
-        public IActionResult Error403()
-        {
-            return View();
-        }
+        //[Route(nameof(Error403))]
+        //public IActionResult Error403()
+        //{
+        //    return View();
+        //}
     }
 }

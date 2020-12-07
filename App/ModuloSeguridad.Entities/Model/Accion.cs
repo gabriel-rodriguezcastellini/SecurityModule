@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,6 +16,7 @@ namespace ModuloSeguridad.Entities.Model
         [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
         public string Nombre { get; set; }        
         
+        [JsonIgnore]
         public List<AccionModulo> AccionModulos { get; set; }
     }
 }

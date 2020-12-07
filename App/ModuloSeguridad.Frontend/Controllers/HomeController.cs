@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
-    [Authorize(nameof(UserAuthorizationHandler))]
+    [Authorize(nameof(UsuarioAuthorizationHandler))]
     public class HomeController : BaseController
     {
         public HomeController(ILogger<HomeController> logger, IAuthorizationService authorizationService) : base(logger, authorizationService)
@@ -22,7 +22,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         }
 
         public IActionResult Index()
-        {
+        {            
             return View(Cookie.GetUsuarioViewModel(HttpContext));
         }
     }

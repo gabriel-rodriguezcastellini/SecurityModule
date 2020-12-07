@@ -32,6 +32,14 @@ namespace ModuloSeguridad.Services
                     .ThenInclude(g=>g.GrupoAccionModulos)
                     .ThenInclude(gam=>gam.AccionModulo)
                     .ThenInclude(am=>am.Accion)
+
+                    //Esto es para que se pueda navegar de AccionModulo a Modulo
+                    .Include(u => u.UsuarioGrupos)
+                    .ThenInclude(ug => ug.Grupo)
+                    .ThenInclude(g => g.GrupoAccionModulos)
+                    .ThenInclude(gam => gam.AccionModulo)
+                    .ThenInclude(am => am.Modulo)
+
                     .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString() && !u.Eliminado);
                 logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : usuario.NombreUsuario + "encontrado"));
                 if (usuario == null) return null;
@@ -47,6 +55,14 @@ namespace ModuloSeguridad.Services
             {
                 logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
             }
+        }
+
+        public bool TienePermisoAccion(string nombreUsuario, string accion, string modulo)
+        {
+            if (context.Usuarios.FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
+                .Any(ug => ug.Grupo.GrupoAccionModulos.
+                Any(gam => gam.AccionModulo.Accion.Nombre == accion && gam.AccionModulo.Modulo.Nombre == modulo)) == true) return true;
+            return false;
         }
     }
 }
