@@ -32,23 +32,10 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -99,19 +86,10 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -140,19 +118,10 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -186,12 +155,6 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("EstadoGrupoId")
                         .HasColumnType("int");
 
@@ -199,9 +162,6 @@ namespace ModuloSeguridad.Entities.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.HasKey("GrupoId");
@@ -242,19 +202,10 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("FechaActualizacion")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -290,12 +241,6 @@ namespace ModuloSeguridad.Entities.Migrations
                     b.Property<string>("CreadoPor")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Eliminado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("EliminadoPor")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("EstadoUsuarioId")
                         .HasColumnType("int");
 
@@ -303,9 +248,6 @@ namespace ModuloSeguridad.Entities.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FechaEliminacion")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Mail")

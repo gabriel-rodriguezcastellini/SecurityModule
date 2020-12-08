@@ -40,7 +40,7 @@ namespace ModuloSeguridad.Services
                     .ThenInclude(gam => gam.AccionModulo)
                     .ThenInclude(am => am.Modulo)
 
-                    .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString() && !u.Eliminado);
+                    .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString());
                 logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : usuario.NombreUsuario + "encontrado"));
                 if (usuario == null) return null;
                 if (EncryptProvider.Md5(clave) != usuario.Clave) return null;

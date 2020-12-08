@@ -13,7 +13,7 @@ namespace ModuloSeguridad.Frontend.Authorization
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
             UsuarioRequirement requirement)
         {
-            if (context.User == null || context.User?.HasClaim(c=>c.Type == ClaimTypes.NameIdentifier) == false) return Task.CompletedTask;
+            if (context.User == null || string.IsNullOrEmpty(context.User?.Identity?.Name) || context.User?.Identity?.IsAuthenticated == false) return Task.CompletedTask;
             context.Succeed(requirement);
             return Task.CompletedTask;
         }

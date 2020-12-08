@@ -11,7 +11,7 @@ namespace ModuloSeguridad.Entities.Model
 
         [MaxLength(50)]
         [MinLength(3)]
-        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
+        [Required]
         public string Nombre { get; set; }
 
         public List<Grupo> Grupos { get; set; }

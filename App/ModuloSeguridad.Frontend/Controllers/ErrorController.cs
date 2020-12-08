@@ -20,11 +20,5 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             return View("Error");
         }
-
-        //[Route(nameof(Error403))]
-        //public IActionResult Error403()
-        //{
-        //    return View();
-        //}
     }
 }

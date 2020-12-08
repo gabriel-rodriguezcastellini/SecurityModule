@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\lib\" />
+    <Folder Include="Views\Usuarios\" />
   </ItemGroup>
 
   <ItemGroup>

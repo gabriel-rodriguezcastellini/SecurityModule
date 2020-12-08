@@ -9,7 +9,7 @@ namespace ModuloSeguridad.Entities.Model
     public class Usuario : BaseEntity
     {
         [Key]
-        [Required(ErrorMessageResourceType =typeof(Validaciones), ErrorMessageResourceName =nameof(Validaciones.Required))]
+        [Required]
         [MaxLength(50)]
         [MinLength(3)]
         [Display(Name =nameof(Usuario))]
@@ -23,11 +23,11 @@ namespace ModuloSeguridad.Entities.Model
         [MinLength(3)]
         public string Apellido { get; set; }
 
-        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
+        [Required]
         [MinLength(3)]
         public string Clave { get; set; }
 
-        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
+        [Required]
         [MaxLength(50)]
         [MinLength(3)]
         [DataType(DataType.EmailAddress)]

@@ -12,6 +12,7 @@ using ModuloSeguridad.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
@@ -35,7 +36,7 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         public async Task<IActionResult> Login(string returnUrl = null)
         {
-            if (HttpContext.User?.Identity?.IsAuthenticated == true)
+            if (User?.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
@@ -56,7 +57,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                 Usuario usuario;
                 List<Claim> claims;
                 ClaimsIdentity claimsIdentity;
-                var accionModulos = new List<AccionModulo>();
+                var accionModulos = new List<UsuarioViewModel.AccionModulo>();
                 ReturnUrl = returnUrl;
                 if (!ModelState.IsValid) return View(model);
                 usuario = usuarioService.GetUsuario(model.NombreUsuario, model.Clave);
@@ -66,10 +67,10 @@ namespace ModuloSeguridad.Frontend.Controllers
                     model.InfoMessage = "Usuario inexistente.";
                     return View(model);
                 }
-                accionModuloHelper.GuardarAccionesModulos(usuario.UsuarioGrupos, ref accionModulos); //carga las acciones/modulos para luego guardarlas en los claims
+                accionModuloHelper.GuardarModulos(usuario.UsuarioGrupos, ref accionModulos); //carga las acciones/modulos para luego guardarlas en los claims
                 claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, usuario.NombreUsuario),
+                    new Claim(JwtRegisteredClaimNames.UniqueName, usuario.NombreUsuario),
                     new Claim(ClaimTypes.Name, usuario.Nombre),
                     new Claim(ClaimTypes.Surname, usuario.Apellido),
                     new Claim(ClaimTypes.Email, usuario.Mail),
@@ -87,15 +88,26 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Ocurrió un error en Login");
-                CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa - exclamation");
-                return View(model);
+                return RetornarError500(e, "Login");
             }
             finally
             {
                 logger.FinMetodo(MethodBase.GetCurrentMethod().Name);
                 usuarioService?.Dispose();
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            logger.LogInformation("Usuario {Name} cerró sesión a las {Time}.",
+                User.Identity.Name, DateTime.UtcNow);
+
+            #region snippet1
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            #endregion
+
+            return RedirectToAction(nameof(Login), "Account");
         }
     }
 }

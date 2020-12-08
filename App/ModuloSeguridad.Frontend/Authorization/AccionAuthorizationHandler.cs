@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Authorization
 {
-    public class AccionAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, UsuarioViewModel>
+    public class AccionAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, string>
     {
         private readonly UsuarioService usuarioService;
 
@@ -22,13 +22,12 @@ namespace ModuloSeguridad.Frontend.Authorization
             this.usuarioService = usuarioService;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, UsuarioViewModel resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, string modulo)
         {
-            if (context.User == null || resource == null) return Task.CompletedTask;
-            if (requirement.Name != resource.AccionModuloActual.Accion.Nombre) return Task.CompletedTask;
+            if (context.User == null || string.IsNullOrEmpty(modulo)) return Task.CompletedTask;
             using (usuarioService)
             {
-                if (usuarioService.TienePermisoAccion(resource.NombreUsuario, requirement.Name, resource.AccionModuloActual.Modulo.Nombre)) context.Succeed(requirement);
+                if (usuarioService.TienePermisoAccion(context.User.Identity.Name, requirement.Name, modulo)) context.Succeed(requirement);
             }
             return Task.CompletedTask;
         }

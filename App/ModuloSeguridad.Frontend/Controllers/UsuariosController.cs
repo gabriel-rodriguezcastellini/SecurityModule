@@ -9,28 +9,38 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
+using ModuloSeguridad.Frontend.Authorization;
+using ModuloSeguridad.Frontend.Models;
+using ModuloSeguridad.Services;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
     public class UsuariosController : BaseController
     {
-        public UsuariosController(ILogger<UsuariosController> logger, IAuthorizationService authorizationService) : base(logger, authorizationService)
+        private readonly UsuarioService usuarioService;
+        public UsuariosController(ILogger<UsuariosController> logger, IAuthorizationService authorizationService, UsuarioService usuarioService) : base(logger, authorizationService)
         {
-
+            this.usuarioService = usuarioService;
         }
 
-        [AllowAnonymous]
+        [AllowAnonymous]        
         public IActionResult RecuperarClave(string nombreUsuario, string mail)
         {
             return View();
         }
 
-        //// GET: Usuarios
-        //public async Task<IActionResult> Index()
-        //{
-        //    var moduloSeguridadContext = _context.Usuarios.Include(u => u.EstadoUsuario);
-        //    return View(await moduloSeguridadContext.ToListAsync());
-        //}
+        public IActionResult Perfil()
+        {
+            return View(Cookie.GetUsuarioViewModel(User));
+        }
+
+        // GET: Usuarios
+        public async Task<IActionResult> Index()
+        {
+            //var moduloSeguridadContext = _context.Usuarios.Include(u => u.EstadoUsuario);
+            //return View(await moduloSeguridadContext.ToListAsync());
+            return View();
+        }
 
         //// GET: Usuarios/Details/5
         //public async Task<IActionResult> Details(string id)

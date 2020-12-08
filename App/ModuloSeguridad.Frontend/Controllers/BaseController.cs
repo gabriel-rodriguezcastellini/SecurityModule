@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Frontend.Authorization;
+using System;
+using System.Globalization;
+using System.Threading;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
@@ -33,5 +36,12 @@ namespace ModuloSeguridad.Frontend.Controllers
             ColorMessage = color;
             SymbolMessage = simbolo;
         }
+
+        protected IActionResult RetornarError500(Exception exception, string methodName)
+        {
+            logger.LogError(exception, "Ocurrió un error en "+methodName);
+            CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa-exclamation");
+            return RedirectToAction(nameof(AccountController.Login), "Account");
+        }        
     }
 }

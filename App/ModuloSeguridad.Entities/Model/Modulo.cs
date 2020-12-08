@@ -10,7 +10,7 @@ namespace ModuloSeguridad.Entities.Model
     {
         public int ModuloId { get; set; }
 
-        [Required(ErrorMessageResourceType = typeof(Validaciones), ErrorMessageResourceName = nameof(Validaciones.Required))]
+        [Required]
         [MaxLength(50)]
         [MinLength(3)]
         public string Nombre { get; set; }      
