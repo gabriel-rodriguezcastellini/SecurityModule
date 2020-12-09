@@ -15,6 +15,7 @@ using ModuloSeguridad.Frontend.Extensions;
 using ModuloSeguridad.Frontend.Models;
 using ModuloSeguridad.Frontend.Models.Usuarios;
 using ModuloSeguridad.Services;
+using ModuloSeguridad.Services.Common;
 using Newtonsoft.Json;
 
 namespace ModuloSeguridad.Frontend.Controllers
@@ -119,8 +120,8 @@ namespace ModuloSeguridad.Frontend.Controllers
             return View(/*Cookie.GetUsuarioViewModel(User)*/);
         }
 
-        [AccionModuloAuthorize("Leer", "Usuarios")]
         // GET: Usuarios
+        [AccionModuloAuthorize(null, Constantes.Modulos.Usuarios)]
         public async Task<IActionResult> Index()
         {
             //var moduloSeguridadContext = _context.Usuarios.Include(u => u.EstadoUsuario);
@@ -134,7 +135,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                     usuariosViewModel.Add(new UsuariosIndexViewModel()
                     {
                         NombreUsuario = item.NombreUsuario,
-                        ApellidoNombre = string.Format(item.Apellido, " ", item.Nombre),
+                        ApellidoNombre = string.Concat(item.Apellido, " ", item.Nombre),
                         Grupos = string.Join(", ", item.UsuarioGrupos?.Select(ug => ug.Grupo?.Codigo)),
                         Email = item.Mail,
                         Estado = item.EstadoUsuario.Nombre

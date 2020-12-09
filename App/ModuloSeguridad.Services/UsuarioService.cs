@@ -70,8 +70,18 @@ namespace ModuloSeguridad.Services
                 .ThenInclude(am => am.Modulo)
 
                 .FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
-                ?.Any(ug => ug.Grupo.GrupoAccionModulos
-                .Any(gam => gam.AccionModulo?.Accion?.Nombre == accion && gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
+                ?.Any(ug => ug.Grupo.GrupoAccionModulos.Any(gam => gam.AccionModulo?.Accion?.Nombre == accion && gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
+        }
+
+        public bool TienePermisoModulo(string nombreUsuario, string modulo)
+        {
+            return context.Usuarios.Include(u => u.UsuarioGrupos)
+                .ThenInclude(ug => ug.Grupo)
+                .ThenInclude(g => g.GrupoAccionModulos)
+                .ThenInclude(gam => gam.AccionModulo)
+                .ThenInclude(am => am.Modulo)
+                .FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
+                ?.Any(ug => ug.Grupo.GrupoAccionModulos.Any(gam => gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
         }
 
         public async Task<IQueryable<Usuario>> GetUsuariosAsync()

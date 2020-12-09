@@ -22,13 +22,20 @@ namespace ModuloSeguridad.Frontend.Authorization
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AccionModuloRequirement requirement)
         {
+            logger.InicioMetodo("HandleRequirementAsync");
+            logger.LogInformation("Módulo: {modulo}", requirement.Modulo);
+            logger.LogInformation("Acción: {accion}", requirement.Accion);
             var nombreUsuario = context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-            logger.LogInformation("El usuario {usuario} quiere entrar al módulo {modulo} para realizar la acción {accion}", 
-                nombreUsuario, requirement.Modulo, requirement.Accion);
+            logger.LogInformation("nombreUsuario: {usuario}", nombreUsuario);
             using (usuarioService)
             {
-                if(usuarioService.TienePermisoAccionModulo(context.User?.FindFirstValue(ClaimTypes.NameIdentifier), requirement.Accion, requirement.Modulo)) context.Succeed(requirement);
+                if (string.IsNullOrEmpty(requirement.Accion))
+                {
+                    if (usuarioService.TienePermisoModulo(context.User?.FindFirstValue(ClaimTypes.NameIdentifier), requirement.Modulo)) context.Succeed(requirement);
+                }
+                else if (usuarioService.TienePermisoAccionModulo(context.User?.FindFirstValue(ClaimTypes.NameIdentifier), requirement.Accion, requirement.Modulo)) context.Succeed(requirement);
             }
+            logger.FinMetodo("HandleRequirementAsync");
             return Task.CompletedTask;
         }
     }

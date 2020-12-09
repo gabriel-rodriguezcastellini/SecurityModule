@@ -1,9 +1,62 @@
 ﻿@model IQueryable<UsuariosIndexViewModel>
-
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{
+    var accionModulos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<UsuarioViewModel.AccionModulo>>(HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.UserData).Value);
+}
 @{
     ViewData["Title"] = "Gestión de usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Gestionar Usuarios</h1>
+<div class="row">
+    <div class="col">
+        <h1>Gestionar Usuarios</h1>
+    </div>
+</div>
 
+@if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Leer && am.Modulo == Constantes.Modulos.Usuarios))
+{
+    <div class="row">
+        <div class="col">
+            <fieldset>
+                <legend>Filtros</legend>
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col">
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+
+                            </div>
+                            <div class="col">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-default">Filtrar</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>    
+
+    @(Html
+        .Grid(Model)
+        .Build(columns =>
+        {
+            columns.Add(model=>model.NombreUsuario).Titled("Usuario");
+            columns.Add(model=>model.ApellidoNombre).Titled("Apellido y Nombre");
+            columns.Add(model=>model.Grupos);
+            columns.Add(model=>model.Email);
+            columns.Add(model => model.Estado);
+        })
+        .Using(GridFilterMode.Header)
+        .Empty("Datos no encontrados")
+        .Sortable()
+        .Pageable()
+    )
+}
