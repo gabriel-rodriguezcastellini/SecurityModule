@@ -2,6 +2,10 @@
 @using ModuloSeguridad.Frontend.Extensions
 @inject IConfiguration IConfiguration
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+@{ 
+    var autenticado = HttpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated == true;
+    var accionModulos = autenticado ? Newtonsoft.Json.JsonConvert.DeserializeObject<List<UsuarioViewModel.AccionModulo>>(HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.UserData).Value) : null;
+}
 <!DOCTYPE html>
 <html lang="es-ar">
 <head>
@@ -21,7 +25,7 @@
 </head>
 <body>
     <!--Navbar -->
-    @if (HttpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated == true)
+    @if (autenticado)
     {
         <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color">
             <a class="navbar-brand" href="#">@Html.Raw(IConfiguration["Properties:Application"])</a>
@@ -36,10 +40,21 @@
                             Inicio
                         </a>
                     </li>
-                    @foreach (var item in Newtonsoft.Json.JsonConvert.DeserializeObject
-                    <List<UsuarioViewModel.AccionModulo>>(User.FindFirst(System.Security.Claims.ClaimTypes.UserData)?.Value).Select(m => m.Modulo).Distinct())
+                    @if (accionModulos.Any(am=>am.Modulo == "Usuarios"))
                     {
-                        @Html.Raw("<li class='nav-item " + Html.Active(item) + "'><a class='nav-link' href='" + Url.Action("Index", item) + "'>" + item + "</a></li>");
+                        <li class="nav-item @Html.Active("Usuarios")">
+                            <a class="nav-link" href="@Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Index), "Usuarios")">
+                                Usuarios
+                            </a>
+                        </li>
+                    }
+                    @if (accionModulos.Any(am => am.Modulo == "Grupos"))
+                    {
+                        <li class="nav-item @Html.Active("Grupos")">
+                            <a class="nav-link" href="@Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.GruposController.Index), "Grupos")">
+                                Usuarios
+                            </a>
+                        </li>
                     }
                 </ul>
                 <ul class="navbar-nav ml-auto nav-flex-icons float-none">
@@ -51,7 +66,7 @@
                         <div class="dropdown-menu dropdown-menu-lg-right dropdown-default" aria-labelledby="navbarDropdownMenuLink-333">
                             <a class="dropdown-item @Html.Active("Usuarios")" href="@Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Perfil), "Usuarios")">Perfil</a>
                             <a class="dropdown-item" id="cerrarSesion">Cerrar sesión</a>
-                            @using (Html.BeginForm(nameof(ModuloSeguridad.Frontend.Controllers.AccountController.Logout), "Account", FormMethod.Post, htmlAttributes: new { @class = "d-none", @id = "cerrarSesionForm" }))
+                            @using (Html.BeginForm(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Logout), "Usuarios", FormMethod.Post, htmlAttributes: new { @class = "d-none", @id = "cerrarSesionForm" }))
                             {
                                 <button type="submit" class="btn-link p-0">Cerrar Sesión</button>
                             }
@@ -67,7 +82,7 @@
         @RenderBody()
     </main>
     
-    <div role="alert" aria-live="assertive" aria-atomic="true" class="d-none toast text-white position-absolute @TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ColorMessage)]" data-delay="100000" data-autohide="true" style="bottom:1rem; right:1rem; z-index:999999">
+    <div role="alert" aria-live="assertive" aria-atomic="true" class="d-none toast text-white position-absolute @TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.ColorMessage)]" data-delay="10000" data-autohide="true" style="bottom:1rem; right:1rem; z-index:999999">
         <div class="toast-body position-relative">
             <div class="mr-3">
                 <i class="@TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.SymbolMessage)] mr-2"></i>
@@ -101,7 +116,7 @@
                 @:$(".toast").removeClass('d-none');
                 @:$('.toast').toast('show');
             }
-            @if (HttpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated == true)
+            @if (autenticado)
             {
                 @:$("#cerrarSesion").on("click", function () {
                     @:$("#cerrarSesionForm").submit()[0];

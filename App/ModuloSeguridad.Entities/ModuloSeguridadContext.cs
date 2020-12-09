@@ -11,6 +11,8 @@ namespace ModuloSeguridad.Entities
     {
         public ModuloSeguridadContext(DbContextOptions options) : base(options) { }
 
+        public string NombreUsuario { get; set; }
+
         public DbSet<Accion> Acciones { get; set; }
         public DbSet<AccionModulo> AccionModulos { get; set; }
         public DbSet<EstadoGrupo> EstadoGrupos { get; set; }
@@ -84,6 +86,7 @@ namespace ModuloSeguridad.Entities
                 if (item is BaseEntity)
                 {
                     (item as BaseEntity).FechaCreacion = DateTime.Now;
+                    (item as BaseEntity).CreadoPor = NombreUsuario;
                 }
             }
 
@@ -92,6 +95,7 @@ namespace ModuloSeguridad.Entities
                 if (item is BaseEntity)
                 {
                     (item as BaseEntity).FechaActualizacion = DateTime.Now;
+                    (item as BaseEntity).ActualizadoPor = NombreUsuario;
                 }
             }
 

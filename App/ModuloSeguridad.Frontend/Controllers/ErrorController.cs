@@ -9,12 +9,6 @@ namespace ModuloSeguridad.Frontend.Controllers
 {
     public class ErrorController : Controller
     {
-        [Route(nameof(ErrorHandler))]
-        public IActionResult ErrorHandler()
-        {
-            return RedirectToAction(nameof(Error), nameof(Error));
-        }
-
         [Route(nameof(Error))]
         public IActionResult Error()
         {

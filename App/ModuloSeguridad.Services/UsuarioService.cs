@@ -5,10 +5,8 @@ using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services.Common;
 using NETCore.Encrypt;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Services
@@ -18,20 +16,20 @@ namespace ModuloSeguridad.Services
         public UsuarioService(ILogger logger, ModuloSeguridadContext context): base(logger, context)
         {
             
-        }
+        }                       
 
-        public Usuario GetUsuario(string nombreUsuario, string clave)
+        public async Task<Usuario> GetUsuarioAsync(string nombreUsuario, string clave)
         {
             try
             {
-                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
+                logger.InicioMetodo("GetUsuarioAsync");
                 logger.LogInformation("nombreUsuario: " + nombreUsuario);
-                var usuario = context.Usuarios
-                    .Include(u=>u.UsuarioGrupos)
-                    .ThenInclude(ug=>ug.Grupo)
-                    .ThenInclude(g=>g.GrupoAccionModulos)
-                    .ThenInclude(gam=>gam.AccionModulo)
-                    .ThenInclude(am=>am.Accion)
+                var usuario = await context.Usuarios
+                    .Include(u => u.UsuarioGrupos)
+                    .ThenInclude(ug => ug.Grupo)
+                    .ThenInclude(g => g.GrupoAccionModulos)
+                    .ThenInclude(gam => gam.AccionModulo)
+                    .ThenInclude(am => am.Accion)
 
                     //Esto es para que se pueda navegar de AccionModulo a Modulo
                     .Include(u => u.UsuarioGrupos)
@@ -40,7 +38,7 @@ namespace ModuloSeguridad.Services
                     .ThenInclude(gam => gam.AccionModulo)
                     .ThenInclude(am => am.Modulo)
 
-                    .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString());
+                    .FirstOrDefaultAsync(u => u.NombreUsuario == nombreUsuario && u.EstadoUsuario.Nombre == Enums.EstadoUsuarios.Activo.ToString());
                 logger.LogInformation("usuario " + (usuario == null ? "no encontrado" : usuario.NombreUsuario + "encontrado"));
                 if (usuario == null) return null;
                 if (EncryptProvider.Md5(clave) != usuario.Clave) return null;
@@ -53,16 +51,32 @@ namespace ModuloSeguridad.Services
             }
             finally
             {
-                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
+                logger.InicioMetodo("GetUsuarioAsync");
             }
+        }        
+
+        public bool TienePermisoAccionModulo(string nombreUsuario, string accion, string modulo)
+        {
+            return context.Usuarios.Include(u=>u.UsuarioGrupos)
+                .ThenInclude(ug=>ug.Grupo)
+                .ThenInclude(g=>g.GrupoAccionModulos)
+                .ThenInclude(gam=>gam.AccionModulo)
+                .ThenInclude(am=>am.Accion)
+
+                .Include(u => u.UsuarioGrupos)
+                .ThenInclude(ug => ug.Grupo)
+                .ThenInclude(g => g.GrupoAccionModulos)
+                .ThenInclude(gam => gam.AccionModulo)
+                .ThenInclude(am => am.Modulo)
+
+                .FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
+                ?.Any(ug => ug.Grupo.GrupoAccionModulos
+                .Any(gam => gam.AccionModulo?.Accion?.Nombre == accion && gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
         }
 
-        public bool TienePermisoAccion(string nombreUsuario, string accion, string modulo)
+        public async Task<IQueryable<Usuario>> GetUsuariosAsync()
         {
-            if (context.Usuarios.FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
-                .Any(ug => ug.Grupo.GrupoAccionModulos.
-                Any(gam => gam.AccionModulo.Accion.Nombre == accion && gam.AccionModulo.Modulo.Nombre == modulo)) == true) return true;
-            return false;
+            return (await context.Usuarios.Include(u => u.EstadoUsuario).Include(u=>u.UsuarioGrupos).ThenInclude(ug=>ug.Grupo).ToListAsync()).AsQueryable();
         }
     }
 }

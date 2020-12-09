@@ -8,14 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Extensions
 {
-    public class AccionModuloHelper
-    {
-        private readonly ILogger logger;
-        public AccionModuloHelper(ILogger logger)
-        {
-            this.logger = logger;
-        }
-        public void GuardarModulos(List<UsuarioGrupo> usuarioGrupos, ref List<UsuarioViewModel.AccionModulo> accionModulos)
+    public static class AccionModuloHelper
+    {                
+        public static void GuardarModulos(List<UsuarioGrupo> usuarioGrupos, ref List<UsuarioViewModel.AccionModulo> accionModulos)
         {
             foreach (var usuarioGrupo in usuarioGrupos)
             {
@@ -23,7 +18,6 @@ namespace ModuloSeguridad.Frontend.Extensions
                 {
                     if (!accionModulos.Any(am=>am.Modulo == accionModulo.Modulo.Nombre && am.Accion == accionModulo.Accion.Nombre))
                     {
-                        logger.LogInformation("Agregando módulo {0} y acción {1} a la lista de acciones del usuario", accionModulo.Modulo.Nombre, accionModulo.Accion.Nombre);
                         accionModulos.Add(new UsuarioViewModel.AccionModulo() { Accion = accionModulo.Accion.Nombre, Modulo = accionModulo.Modulo.Nombre });
                     }
                 }

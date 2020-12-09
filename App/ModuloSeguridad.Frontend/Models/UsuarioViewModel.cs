@@ -28,8 +28,6 @@ namespace ModuloSeguridad.Frontend.Models
 
         public List<AccionModulo> AccionModulos { get; set; }
 
-        public AccionModulo AccionModuloActual { get; set; }
-
         public class AccionModulo
         {
             public string Accion { get; set; }

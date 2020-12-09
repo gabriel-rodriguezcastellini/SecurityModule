@@ -8,15 +8,11 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 using ModuloSeguridad.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using ModuloSeguridad.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ModuloSeguridad.Frontend.Controllers;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
 using ModuloSeguridad.Frontend.Authorization;
-using static ModuloSeguridad.Frontend.Authorization.UsuarioAuthorizationHandler;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -39,23 +35,29 @@ namespace ModuloSeguridad.Frontend
 
             services.AddTransient((container)=> 
             {
-                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), 
+                    container.GetRequiredService<ModuloSeguridadContext>());
             });
 
+            #region Autorizacion
+            services.AddSingleton<IAuthorizationPolicyProvider, AccionModuloPolicyProvider>();
+            services.AddSingleton<IAuthorizationHandler, AccionModuloAuthorizationHandler>();            
+            #endregion
+
+            services.AddMvc();
+
+            #region Autenticacion
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
+                .AddCookie(options =>
+                {
+                    options.AccessDeniedPath = "/Usuarios/AccesoDenegado";
+                    options.LoginPath = "/Usuarios/Login";
+                });
 
+
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            services.AddControllersWithViews();
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy(nameof(UsuarioAuthorizationHandler), policy => policy.Requirements.Add(new UsuarioRequirement()));
-            });
-
-            services.AddSingleton<IAuthorizationHandler, UsuarioAuthorizationHandler>();
-            services.AddSingleton<IAuthorizationHandler, AccionAuthorizationHandler>();
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +73,7 @@ namespace ModuloSeguridad.Frontend
             }
             else
             {
-                app.UseExceptionHandler(string.Concat("/", nameof(ErrorController.ErrorHandler)));
+                app.UseExceptionHandler(string.Concat("/", nameof(ErrorController.Error)));
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -83,9 +85,7 @@ namespace ModuloSeguridad.Frontend
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
             });
         }
 

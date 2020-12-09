@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Frontend.Authorization;
 using System;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
-    [AutoValidateAntiforgeryToken]    
+    [AutoValidateAntiforgeryToken]
+    [Authorize]
     public class BaseController : Controller
     {
         protected readonly ILogger<BaseController> logger;
@@ -39,9 +42,15 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         protected IActionResult RetornarError500(Exception exception, string methodName)
         {
-            logger.LogError(exception, "Ocurrió un error en "+methodName);
+            logger.LogError(exception, "Ocurrió un error en " + methodName);
             CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa-exclamation");
-            return RedirectToAction(nameof(AccountController.Login), "Account");
-        }        
+            return RedirectToAction(nameof(ErrorController.Error), "Error");
+        }
+
+        protected async Task<IActionResult> VerificarPermiso(OperationAuthorizationRequirement requirement, string modulo)
+        {
+            if (!(await AuthorizationService.AuthorizeAsync(User, modulo, requirement)).Succeeded) return new ForbidResult();
+            return null;
+        }
     }
 }

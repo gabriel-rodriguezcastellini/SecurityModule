@@ -3,9 +3,9 @@ using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services;
 using System.ComponentModel.DataAnnotations;
 
-namespace ModuloSeguridad.Frontend.Models.Account
+namespace ModuloSeguridad.Frontend.Models.Usuarios
 {
-    public class AccountLoginViewModel : BaseViewModel
+    public class UsuariosLoginViewModel : BaseViewModel
     {
         [Display(Name = nameof(Usuario))]
         [Required(ErrorMessageResourceType =typeof(ValidationMessages), ErrorMessageResourceName = nameof(ValidationMessages.Required))]
