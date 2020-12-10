@@ -11,5 +11,11 @@ namespace ModuloSeguridad.Services.Common
             Activo,
             Inactivo
         }
+
+        public enum EstadoGrupos
+        {
+            Activo,
+            Inactivo
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Bogus;
+using Bogus.Extensions;
+using Microsoft.EntityFrameworkCore;
 using ModuloSeguridad.Entities.Model;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace ModuloSeguridad.Entities
         public DbSet<GrupoAccionModulo> GrupoAccionModulos { get; set; }
         public DbSet<Modulo> Modulos { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }                                
-        public DbSet<UsuarioGrupo> UsuarioGrupos { get; set; }
+        public DbSet<UsuarioGrupo> UsuarioGrupos { get; set; }        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +77,23 @@ namespace ModuloSeguridad.Entities
                 .HasOne(ug => ug.Usuario)
                 .WithMany(u => u.UsuarioGrupos)
                 .HasForeignKey(ug => ug.NombreUsuario);
+
+            base.OnModelCreating(modelBuilder);
+
+            #region Datos de prueba
+            var index = 0;
+            var usuariosPrueba = new Faker<Usuario>("es_MX")
+                .RuleFor(u => u.Nombre, (f, u) => f.Name.FirstName())
+                .RuleFor(u => u.Apellido, (f, u) => f.Name.LastName())
+                .RuleFor(u => u.NombreUsuario, (f, u) => string.Concat(f.Internet.UserName(u.Nombre, u.Apellido), index++))
+                .RuleFor(u => u.Mail, (f, u) => f.Internet.Email(u.Nombre, u.Apellido))
+                .RuleFor(u => u.Clave, (f, u) => f.Internet.Password())
+                .RuleFor(u => u.EstadoUsuarioId, 1);
+
+            modelBuilder.Entity<Usuario>()
+                .HasData(usuariosPrueba.Generate(2500));
+            #endregion
+
         }
 
         public override int SaveChanges()

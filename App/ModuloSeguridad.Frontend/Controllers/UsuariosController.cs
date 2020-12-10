@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Frontend.Authorization;
@@ -23,9 +24,14 @@ namespace ModuloSeguridad.Frontend.Controllers
     public class UsuariosController : BaseController
     {
         private readonly UsuarioService usuarioService;
-        public UsuariosController(ILogger<UsuariosController> logger, IAuthorizationService authorizationService, UsuarioService usuarioService) : base(logger, authorizationService)
+        private readonly GrupoService grupoService;
+        public UsuariosController(ILogger<UsuariosController> logger, 
+            IAuthorizationService authorizationService, 
+            UsuarioService usuarioService,
+            GrupoService grupoService) : base(logger, authorizationService)
         {
             this.usuarioService = usuarioService;
+            this.grupoService = grupoService;
         }
         
         [AllowAnonymous]
@@ -126,13 +132,26 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             //var moduloSeguridadContext = _context.Usuarios.Include(u => u.EstadoUsuario);
             //return View(await moduloSeguridadContext.ToListAsync());
-            using (usuarioService)
+            using(usuarioService)
+            using (grupoService)
             {
-                var usuariosViewModel = new List<UsuariosIndexViewModel>();
-                var usuarios = await usuarioService.GetUsuariosAsync();
+                var usuariosViewModel = new UsuariosIndexViewModel()
+                {
+                    Grupos = new List<SelectListItem>()
+                    {
+                        new SelectListItem()
+                        {
+                            Value = "-1",
+                            Text = "TODOS"
+                        }
+                    }
+                };
+                usuariosViewModel.Grupos.AddRange((await grupoService.GetGruposAsync())
+                    .Select(g => new SelectListItem() { Value = g.GrupoId.ToString(), Text = g.Codigo }));
+                var usuarios = await usuarioService.GetUsuariosAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 foreach (var item in usuarios)
                 {
-                    usuariosViewModel.Add(new UsuariosIndexViewModel()
+                    usuariosViewModel.Usuarios.Add(new UsuariosIndexViewModel.Usuario()
                     {
                         NombreUsuario = item.NombreUsuario,
                         ApellidoNombre = string.Concat(item.Apellido, " ", item.Nombre),
@@ -141,7 +160,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                         Estado = item.EstadoUsuario.Nombre
                     });
                 }
-                return View(usuariosViewModel.AsQueryable());
+                return View(usuariosViewModel);
             }
         }
 

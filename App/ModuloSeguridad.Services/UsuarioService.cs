@@ -84,9 +84,10 @@ namespace ModuloSeguridad.Services
                 ?.Any(ug => ug.Grupo.GrupoAccionModulos.Any(gam => gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
         }
 
-        public async Task<IQueryable<Usuario>> GetUsuariosAsync()
+        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual)
         {
-            return (await context.Usuarios.Include(u => u.EstadoUsuario).Include(u=>u.UsuarioGrupos).ThenInclude(ug=>ug.Grupo).ToListAsync()).AsQueryable();
+            return (await context.Usuarios.Where(u=>u.NombreUsuario != usuarioActual)
+                .Include(u => u.EstadoUsuario).Include(u=>u.UsuarioGrupos).ThenInclude(ug=>ug.Grupo).ToListAsync()).AsQueryable();
         }
     }
 }
