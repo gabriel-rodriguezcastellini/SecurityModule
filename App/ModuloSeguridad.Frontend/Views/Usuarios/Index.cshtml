@@ -8,7 +8,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
+<div class="row w-100 mx-auto">
     <div class="col">
         <h1>Gestionar Usuarios</h1>
     </div>
@@ -16,20 +16,33 @@
 
 @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Leer && am.Modulo == Constantes.Modulos.Usuarios))
 {
-    <div class="row">
+    <div class="row w-100 mx-auto no-gutters my-4">
         <div class="col">
-            <fieldset>
-                <legend>Filtros</legend>
-                <div class="row">
+            <fieldset class="border">
+                <div class="row w-100 mx-auto">
                     <div class="col">
+                        <p>Filtros</p>
+                    </div>
+                </div>
+                <div class="row w-100 mx-auto">
+                    <div class="col-10">
                         <div class="row">
                             <div class="col">
-                                <div class="form-group row">
-                                    @Html.LabelFor(model=>model.ApellidoNombre, null, new { @class= "col-sm-2 col-form-label" })
-                                    <label for="inputEmail3MD" class="col-sm-2 col-form-label">Email</label>
-                                    <div class="col-sm-10">
+                                <div class="form-group row w-100 mx-auto">
+                                    @Html.LabelFor(u => u.ApellidoNombre, null, new { @class = "col-form-label my-auto" })
+                                    <div class="col">
                                         <div class="md-form mt-0">
-                                            <input type="email" class="form-control" id="inputEmail3MD" placeholder="Email">
+                                            @Html.EditorFor(u => u.ApellidoNombre, new
+                                            {
+                                                htmlAttributes = new
+                                                {
+                                                    @class = "form-control inputFiltro",
+                                                @placeholder = "Ingresa al menos 3 caracteres",
+                                                    @data_toggle = "tooltip",
+                                                    @title = "Ingresa al menos 3 caracteres"
+                                                },
+                                            })
+                                            @Html.ValidationMessageFor(u => u.ApellidoNombre, null, htmlAttributes: new { @class = "text-danger" })
                                         </div>
                                     </div>
                                 </div>
@@ -37,41 +50,76 @@
                         </div>
                         <div class="row">
                             <div class="col">
-
+                                <div class="form-group row">
+                                    @Html.LabelFor(u => u.GrupoId, null, new { @class = "col col-form-label text-right" })
+                                    <div class="col my-auto">
+                                        <div class="md-form my-auto">
+                                            @Html.DropDownListFor(u => u.GrupoId, Model.Grupos)
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col">
-
+                                <div class="form-group row">
+                                    @Html.LabelFor(u => u.Estado, null, new { @class = "col col-form-label text-right" })
+                                    <div class="col my-auto">
+                                        <div class="md-form my-auto">
+                                            @Html.DropDownListFor(u => u.Estado, Html.GetEnumSelectList(Model.Estado.GetType()))
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col">
-                        <button type="submit" class="btn btn-default">Filtrar</button>
+                    <div class="col-2 text-center">
+                        <button type="submit" class="btn btn-primary btn-filtrar">Filtrar</button>
                     </div>
                 </div>
             </fieldset>
         </div>
-    </div>    
+    </div>
 
-    @(Html
-        .Grid(Model.Usuarios.AsQueryable())
-        .Build(columns =>
+    @Html.AjaxGrid(Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Index), Constantes.Modulos.Usuarios,
+        new { apellidoNombre =Model.ApellidoNombre, grupoId=Model.GrupoId}))    
+}
+
+<div class="row w-100 mx-auto">
+    <div class="col">
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Agregar && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            columns.Add(model=>model.NombreUsuario).Titled("Usuario");
-            columns.Add(model=>model.ApellidoNombre).Titled("Apellido y Nombre");
-            columns.Add(model=>model.Grupos).Titled("Grupos");
-            columns.Add(model=>model.Email).Titled("Email");
-            columns.Add(model => model.Estado).Titled("Estado");
-        })
-        .Using(GridFilterMode.Header)
-        .Empty("Datos no encontrados")
-        .Sortable()
-        .Pageable(pager=>
+            <button type="button" class="btn btn-primary">Agregar</button>
+        }
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Eliminar && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            pager.PageSizes = new Dictionary<int, string> { { 2, "2" }, { 4, "4" }, { 11, "11" } };
-            pager.ShowPageSizes = true;
-            pager.PagesToDisplay = 3;
-            pager.CurrentPage = 1;
-            pager.RowsPerPage = 11;
-        })
-    )
+            <button type="button" class="btn btn-danger">Eliminar</button>
+        }
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Modificar && am.Modulo == Constantes.Modulos.Usuarios))
+        {
+            <button type="button" class="btn btn-warning">Modificar</button>
+        }
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.ResetearClave && am.Modulo == Constantes.Modulos.Usuarios))
+        {
+            <button type="button" class="btn btn-secondary">Resetear Clave</button>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $(".btn-filtrar").on("click", function () {
+                if ($(".inputFiltro").val().length < 3 && $(".inputFiltro").val().length > 0) {
+                    $(".inputFiltro").tooltip("show");
+                    return;
+                }
+
+                var grid = new MvcGrid(document.querySelector(".mvc-grid"), {
+                    query: "apellidoNombre=" + $("#ApellidoNombre").val() + "&grupoId=" + $("#GrupoId").val() + "&estado=" + $("#Estado").val(),
+                    loadingDelay: 0
+                });
+                
+                grid.reload();
+            });
+        });
+    </script>
 }

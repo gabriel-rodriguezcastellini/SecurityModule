@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
-    [AutoValidateAntiforgeryToken]
     [Authorize]
     public class BaseController : Controller
     {
@@ -40,9 +39,9 @@ namespace ModuloSeguridad.Frontend.Controllers
             SymbolMessage = simbolo;
         }
 
-        protected IActionResult RetornarError500(Exception exception, string methodName)
-        {
-            logger.LogError(exception, "Ocurrió un error en " + methodName);
+        protected IActionResult RetornarError500(Exception exception, string actionName, string controllerName)
+        {            
+            logger.LogError(exception, "Ocurrió un error en action/controller {action}/{controller}", actionName, controllerName);
             CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa-exclamation");
             return RedirectToAction(nameof(ErrorController.Error), "Error");
         }

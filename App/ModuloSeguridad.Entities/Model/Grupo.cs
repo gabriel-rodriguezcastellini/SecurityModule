@@ -15,6 +15,9 @@ namespace ModuloSeguridad.Entities.Model
         [Required]
         public string Codigo { get; set; }        
 
+        [MaxLength(100)]
+        public string Descripcion { get; set; }
+
         public int EstadoGrupoId { get; set; }
 
         [ForeignKey(nameof(EstadoGrupoId))]

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using ModuloSeguridad.Frontend.Controllers;
 using Microsoft.AspNetCore.Http;
 using ModuloSeguridad.Frontend.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -31,12 +32,16 @@ namespace ModuloSeguridad.Frontend
         {
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
-                    Configuration.GetConnectionString(nameof(ModuloSeguridadContext))));            
+                    Configuration.GetConnectionString(nameof(ModuloSeguridadContext)), options=>options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddTransient((container)=> 
             {
-                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), 
-                    container.GetRequiredService<ModuloSeguridadContext>());
+                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+            });
+
+            services.AddTransient((container) =>
+            {
+                return new GrupoService(container.GetRequiredService<ILogger<GrupoService>>(), container.GetRequiredService<ModuloSeguridadContext>());
             });
 
             #region Autorizacion
@@ -44,7 +49,10 @@ namespace ModuloSeguridad.Frontend
             services.AddSingleton<IAuthorizationHandler, AccionModuloAuthorizationHandler>();            
             #endregion
 
-            services.AddMvc();
+            services.AddMvc(options=> 
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); //valida AntiforgeryToken en todos los métodos
+            });
 
             #region Autenticacion
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

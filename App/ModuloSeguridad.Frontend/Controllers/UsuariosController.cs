@@ -18,6 +18,7 @@ using ModuloSeguridad.Frontend.Models.Usuarios;
 using ModuloSeguridad.Services;
 using ModuloSeguridad.Services.Common;
 using Newtonsoft.Json;
+using static ModuloSeguridad.Services.Common.Enums;
 
 namespace ModuloSeguridad.Frontend.Controllers
 {
@@ -95,7 +96,7 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
             catch (Exception e)
             {
-                return RetornarError500(e, "Login");
+                return RetornarError500(e, ControllerContext?.ActionDescriptor?.ActionName, ControllerContext?.ActionDescriptor?.ControllerName);
             }
             finally
             {
@@ -128,39 +129,54 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         // GET: Usuarios
         [AccionModuloAuthorize(null, Constantes.Modulos.Usuarios)]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string apellidoNombre, int? grupoId, EstadoUsuarios estado)
         {
-            //var moduloSeguridadContext = _context.Usuarios.Include(u => u.EstadoUsuario);
-            //return View(await moduloSeguridadContext.ToListAsync());
-            using(usuarioService)
-            using (grupoService)
+            try
             {
-                var usuariosViewModel = new UsuariosIndexViewModel()
+                logger.InicioMetodo(ControllerContext?.ActionDescriptor?.ActionName);
+                logger.LogInformation("apellidoNombre: " + apellidoNombre);
+                logger.LogInformation("grupoId: " + grupoId);
+                logger.LogInformation("estado: " + estado.ToString());
+                using (usuarioService)
+                using (grupoService)
                 {
-                    Grupos = new List<SelectListItem>()
+                    var usuariosViewModel = new UsuariosIndexViewModel()
+                    {
+                        Grupos = new List<SelectListItem>()
                     {
                         new SelectListItem()
                         {
-                            Value = "-1",
+                            Value = null,
                             Text = "TODOS"
                         }
-                    }
-                };
-                usuariosViewModel.Grupos.AddRange((await grupoService.GetGruposAsync())
-                    .Select(g => new SelectListItem() { Value = g.GrupoId.ToString(), Text = g.Codigo }));
-                var usuarios = await usuarioService.GetUsuariosAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                foreach (var item in usuarios)
-                {
-                    usuariosViewModel.Usuarios.Add(new UsuariosIndexViewModel.Usuario()
+                    },
+                    };
+                    usuariosViewModel.Grupos.AddRange((await grupoService.GetGruposAsync())
+                        .Select(g => new SelectListItem() { Value = g.GrupoId.ToString(), Text = g.Codigo }));
+                    var usuarios = await usuarioService.GetUsuariosAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), apellidoNombre, grupoId, estado);
+                    logger.LogInformation("Mostrando {cantidad} usuarios", usuarios?.Count());
+                    foreach (var item in usuarios)
                     {
-                        NombreUsuario = item.NombreUsuario,
-                        ApellidoNombre = string.Concat(item.Apellido, " ", item.Nombre),
-                        Grupos = string.Join(", ", item.UsuarioGrupos?.Select(ug => ug.Grupo?.Codigo)),
-                        Email = item.Mail,
-                        Estado = item.EstadoUsuario.Nombre
-                    });
+                        usuariosViewModel.Usuarios.Add(new UsuariosIndexViewModel.Usuario()
+                        {
+                            NombreUsuario = item.NombreUsuario,
+                            ApellidoNombre = string.Concat(item.Apellido, " ", item.Nombre),
+                            Grupos = string.Join(", ", item.UsuarioGrupos?.Select(ug => ug.Grupo?.Codigo)),
+                            Email = item.Mail,
+                            Estado = item.EstadoUsuario.Nombre
+                        });
+                    }
+                    if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest") return PartialView("_IndexGrid", usuariosViewModel.Usuarios.AsQueryable());
+                    return View(usuariosViewModel);
                 }
-                return View(usuariosViewModel);
+            }
+            catch (Exception e)
+            {
+                return RetornarError500(e, ControllerContext?.ActionDescriptor?.ActionName, ControllerContext?.ActionDescriptor?.ControllerName);
+            }
+            finally
+            {
+                logger.FinMetodo(ControllerContext?.ActionDescriptor?.ActionName);
             }
         }
 

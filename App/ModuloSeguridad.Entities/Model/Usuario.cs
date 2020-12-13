@@ -12,7 +12,6 @@ namespace ModuloSeguridad.Entities.Model
         [Required]
         [MaxLength(50)]
         [MinLength(3)]
-        [Display(Name =nameof(Usuario))]
         public string NombreUsuario { get; set; }
 
         [MaxLength(50)]

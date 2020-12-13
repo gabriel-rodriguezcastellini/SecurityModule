@@ -8,6 +8,10 @@ namespace ModuloSeguridad.Services.Common
     {
         public enum EstadoUsuarios
         {
+            /// <summary>
+            /// Usado solo para las vistas
+            /// </summary>
+            Todos,
             Activo,
             Inactivo
         }

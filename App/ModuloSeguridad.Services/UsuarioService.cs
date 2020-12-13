@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using static ModuloSeguridad.Services.Common.Enums;
 
 namespace ModuloSeguridad.Services
 {
@@ -75,7 +76,7 @@ namespace ModuloSeguridad.Services
 
         public bool TienePermisoModulo(string nombreUsuario, string modulo)
         {
-            return context.Usuarios.Include(u => u.UsuarioGrupos)
+            return context.Usuarios.OrderBy(u=>u.NombreUsuario).Include(u => u.UsuarioGrupos)
                 .ThenInclude(ug => ug.Grupo)
                 .ThenInclude(g => g.GrupoAccionModulos)
                 .ThenInclude(gam => gam.AccionModulo)
@@ -84,10 +85,18 @@ namespace ModuloSeguridad.Services
                 ?.Any(ug => ug.Grupo.GrupoAccionModulos.Any(gam => gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
         }
 
-        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual)
+        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual, string apellidoNombre = null, int? grupoId = null, EstadoUsuarios estado = EstadoUsuarios.Todos)
         {
-            return (await context.Usuarios.Where(u=>u.NombreUsuario != usuarioActual)
-                .Include(u => u.EstadoUsuario).Include(u=>u.UsuarioGrupos).ThenInclude(ug=>ug.Grupo).ToListAsync()).AsQueryable();
+            var usuarios = (await context.Usuarios.Where(u => u.NombreUsuario != usuarioActual)
+                .Include(u => u.EstadoUsuario).Include(u => u.UsuarioGrupos).ThenInclude(ug => ug.Grupo).ToListAsync()).AsQueryable();
+            if (!string.IsNullOrEmpty(apellidoNombre))
+            {
+                apellidoNombre = apellidoNombre.Trim().ToLower();
+                usuarios = usuarios.Where(u => u.Apellido.ToLower().Contains(apellidoNombre) || u.Nombre.ToLower().Contains(apellidoNombre));
+            }
+            if (grupoId != null) usuarios = usuarios.ToList().Where(u => u.UsuarioGrupos?.Any(ug => ug.GrupoId == (int)grupoId) == true).AsQueryable();
+            if (estado != EstadoUsuarios.Todos) usuarios = usuarios.Where(u => u.EstadoUsuario.Nombre == estado.ToString());
+            return usuarios.AsQueryable();
         }
     }
 }
