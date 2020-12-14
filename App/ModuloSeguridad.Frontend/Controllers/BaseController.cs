@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Frontend.Authorization;
+using ModuloSeguridad.Services.Common;
 using System;
 using System.Globalization;
 using System.Threading;
@@ -18,13 +19,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         protected string ReturnUrl { get; set; }
 
         [TempData]
-        public string InfoMessage { get; set; }
-
-        [TempData]
-        public string ColorMessage { get; set; }
-
-        [TempData]
-        public string SymbolMessage { get; set; }
+        public string InfoMessage { get; set; }        
 
         public BaseController(ILogger<BaseController> logger, IAuthorizationService authorizationService)
         {
@@ -32,17 +27,16 @@ namespace ModuloSeguridad.Frontend.Controllers
             AuthorizationService = authorizationService;
         }
 
-        protected void CargarNotificacion(string mensaje, string color, string simbolo)
+        protected void CargarNotificacion(string mensaje)
         {
             InfoMessage = mensaje;
-            ColorMessage = color;
-            SymbolMessage = simbolo;
+            TempData[nameof(InfoMessage)] = mensaje;
         }
 
         protected IActionResult RetornarError500(Exception exception, string actionName, string controllerName)
         {            
             logger.LogError(exception, "Ocurrió un error en action/controller {action}/{controller}", actionName, controllerName);
-            CargarNotificacion("Ha ocurrido un error", "danger-color", "fas fa-exclamation");
+            CargarNotificacion("Ha ocurrido un error");
             return RedirectToAction(nameof(ErrorController.Error), "Error");
         }
 

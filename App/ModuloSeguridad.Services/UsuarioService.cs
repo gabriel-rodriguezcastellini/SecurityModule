@@ -3,10 +3,14 @@ using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services.Common;
+using ModuloSeguridad.Services.Extensions;
+using ModuloSeguridad.Services.Extensions.Mail;
 using NETCore.Encrypt;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using static ModuloSeguridad.Services.Common.Enums;
 
@@ -14,10 +18,12 @@ namespace ModuloSeguridad.Services
 {
     public class UsuarioService : BaseService
     {
-        public UsuarioService(ILogger logger, ModuloSeguridadContext context): base(logger, context)
+        private readonly MailSender mailSender;
+
+        public UsuarioService(ILogger logger, ModuloSeguridadContext context, MailSender mailSender): base(logger, context)
         {
-            
-        }                       
+            this.mailSender = mailSender;
+        }
 
         public async Task<Usuario> GetUsuarioAsync(string nombreUsuario, string clave)
         {
@@ -54,11 +60,31 @@ namespace ModuloSeguridad.Services
             {
                 logger.InicioMetodo("GetUsuarioAsync");
             }
-        }        
+        }
+
+        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual, string apellidoNombre = null, int? grupoId = null, EstadoUsuarios estado = EstadoUsuarios.Todos)
+        {
+            var usuarios = (await context.Usuarios.Where(u => u.NombreUsuario != usuarioActual)
+                .Include(u => u.EstadoUsuario).Include(u => u.UsuarioGrupos).ThenInclude(ug => ug.Grupo).ToListAsync()).AsQueryable();
+            if (!string.IsNullOrEmpty(apellidoNombre))
+            {
+                apellidoNombre = apellidoNombre.Trim().ToLower();
+                usuarios = usuarios.Where(u => u.Apellido.ToLower().Contains(apellidoNombre) || u.Nombre.ToLower().Contains(apellidoNombre));
+            }
+            if (grupoId != null) usuarios = usuarios.ToList().Where(u => u.UsuarioGrupos?.Any(ug => ug.GrupoId == (int)grupoId) == true).AsQueryable();
+            if (estado != EstadoUsuarios.Todos) usuarios = usuarios.Where(u => u.EstadoUsuario.Nombre == estado.ToString());
+            return usuarios.AsQueryable();
+        }
+
+        public async Task<Usuario> GetUsuarioAsync(string nombreUsuario)
+        {
+            return await context.Usuarios.OrderBy(u=>u.NombreUsuario).Include(u=>u.EstadoUsuario)
+                .Include(u => u.UsuarioGrupos).ThenInclude(ug=>ug.Grupo).SingleOrDefaultAsync(u=>u.NombreUsuario == nombreUsuario);
+        }
 
         public bool TienePermisoAccionModulo(string nombreUsuario, string accion, string modulo)
         {
-            return context.Usuarios.Include(u=>u.UsuarioGrupos)
+            return context.Usuarios.OrderBy(u => u.NombreUsuario).Include(u=>u.UsuarioGrupos)
                 .ThenInclude(ug=>ug.Grupo)
                 .ThenInclude(g=>g.GrupoAccionModulos)
                 .ThenInclude(gam=>gam.AccionModulo)
@@ -83,20 +109,58 @@ namespace ModuloSeguridad.Services
                 .ThenInclude(am => am.Modulo)
                 .FirstOrDefault(u => u.NombreUsuario == nombreUsuario)?.UsuarioGrupos
                 ?.Any(ug => ug.Grupo.GrupoAccionModulos.Any(gam => gam.AccionModulo?.Modulo?.Nombre == modulo)) == true;
+        }        
+
+        public async Task<bool> UsuarioExiste(string nombreUsuario)
+        {
+            return await context.Usuarios.AnyAsync(e => e.NombreUsuario == nombreUsuario);
         }
 
-        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual, string apellidoNombre = null, int? grupoId = null, EstadoUsuarios estado = EstadoUsuarios.Todos)
+        public async Task<bool> UsuarioExiste(string nombreUsuario, string mail)
         {
-            var usuarios = (await context.Usuarios.Where(u => u.NombreUsuario != usuarioActual)
-                .Include(u => u.EstadoUsuario).Include(u => u.UsuarioGrupos).ThenInclude(ug => ug.Grupo).ToListAsync()).AsQueryable();
-            if (!string.IsNullOrEmpty(apellidoNombre))
-            {
-                apellidoNombre = apellidoNombre.Trim().ToLower();
-                usuarios = usuarios.Where(u => u.Apellido.ToLower().Contains(apellidoNombre) || u.Nombre.ToLower().Contains(apellidoNombre));
-            }
-            if (grupoId != null) usuarios = usuarios.ToList().Where(u => u.UsuarioGrupos?.Any(ug => ug.GrupoId == (int)grupoId) == true).AsQueryable();
-            if (estado != EstadoUsuarios.Todos) usuarios = usuarios.Where(u => u.EstadoUsuario.Nombre == estado.ToString());
-            return usuarios.AsQueryable();
+            return await context.Usuarios.AnyAsync(e => e.NombreUsuario == nombreUsuario && e.Mail == mail && e.EstadoUsuario.Nombre == EstadoUsuarios.Activo.ToString());
+        }
+
+        public async Task Agregar(Usuario usuario)
+        {
+            context.NombreUsuario = usuario.NombreUsuario;
+            var clave = new Random().Next(1000, 9999).ToString();
+            usuario.Clave = EncryptProvider.Md5(clave);
+            await context.Usuarios.AddAsync(usuario);
+            await context.SaveChangesAsync();
+            await ResetearClave(usuario.NombreUsuario, "Bienvenido", true, clave);
+        }
+
+        public async Task ResetearClave(string nombreUsuario, string asunto = null, bool bienvenida = true, string clave = null)
+        {
+            context.NombreUsuario = nombreUsuario;
+            var nuevaClave = string.IsNullOrEmpty(clave) ? new Random().Next(1000, 9999).ToString() : clave;
+            var usuario = await context.Usuarios.FindAsync(nombreUsuario);
+            usuario.Clave = EncryptProvider.Md5(nuevaClave);
+            context.Usuarios.Update(usuario);
+            await context.SaveChangesAsync();
+            await mailSender.EnviarMailAsync(new Message(usuario.Mail, asunto, string.Format(string.Concat("Tu ", bienvenida ? "clave" : "nueva clave", " es: {0}"), nuevaClave)));
+        }
+
+        public async Task<bool> Eliminar(string nombreUsuario)
+        {
+            if (!await UsuarioExiste(nombreUsuario)) return false;
+            context.Usuarios.Remove(await context.Usuarios.FindAsync(nombreUsuario));
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task Modificar(Usuario usuario)
+        {
+            context.NombreUsuario = usuario.NombreUsuario;
+            if (!await UsuarioExiste(usuario.NombreUsuario)) return;
+            context.Usuarios.Update(usuario);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> EsContraseniaCorrecta(string nombreUsuario, string clave)
+        {
+            return (await context.Usuarios.FindAsync(nombreUsuario))?.Clave == EncryptProvider.Md5(clave);
         }
     }
 }

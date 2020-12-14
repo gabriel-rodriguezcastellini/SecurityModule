@@ -1,4 +1,4 @@
-﻿@model IQueryable<UsuariosIndexViewModel.Usuario>
+﻿@model IQueryable<UsuarioIndexViewModel.Usuario>
 
 @(Html
     .Grid(Model)
@@ -11,8 +11,7 @@
         columns.Add(model => model.Estado).Titled("Estado");
     })
     .AppendCss("table-hover")
-    .RowAttributed(model => new { @class = model.Estado == ModuloSeguridad.Services.Common.Enums.EstadoUsuarios.Activo.ToString() ? "green lighten-4 activo" :
-        null, data_nombre_usuario = model.NombreUsuario, @style="cursor:pointer"})
+    .RowAttributed(model => new { @class = "filaUsuario", data_nombre_usuario = model.NombreUsuario, @style="cursor:pointer"})
     .Using(GridFilterMode.Header)
     .Empty("Datos no encontrados")
     .Sortable()

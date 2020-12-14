@@ -14,6 +14,7 @@ using ModuloSeguridad.Frontend.Controllers;
 using Microsoft.AspNetCore.Http;
 using ModuloSeguridad.Frontend.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ModuloSeguridad.Services.Extensions.Mail;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -30,18 +31,31 @@ namespace ModuloSeguridad.Frontend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(Configuration.GetSection(nameof(MailConfiguration)).Get<MailConfiguration>());
+
+            services.AddScoped((container) =>
+            {
+                return new MailSender(container.GetRequiredService<MailConfiguration>(), container.GetRequiredService<ILogger<MailSender>>());
+            });
+
             services.AddDbContext<ModuloSeguridadContext>(
                 options => options.UseSqlServer(
                     Configuration.GetConnectionString(nameof(ModuloSeguridadContext)), options=>options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddTransient((container)=> 
             {
-                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+                return new UsuarioService(container.GetRequiredService<ILogger<UsuarioService>>(), 
+                    container.GetRequiredService<ModuloSeguridadContext>(), container.GetRequiredService<MailSender>());
             });
 
             services.AddTransient((container) =>
             {
                 return new GrupoService(container.GetRequiredService<ILogger<GrupoService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+            });
+
+            services.AddTransient((container) =>
+            {
+                return new EstadoUsuarioService(container.GetRequiredService<ILogger<EstadoUsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
             });
 
             #region Autorizacion
@@ -60,12 +74,9 @@ namespace ModuloSeguridad.Frontend
                 {
                     options.AccessDeniedPath = "/Usuarios/AccesoDenegado";
                     options.LoginPath = "/Usuarios/Login";
-                });
-
-
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+                });            
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            #endregion
+            #endregion            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

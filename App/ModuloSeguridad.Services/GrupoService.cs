@@ -10,10 +10,7 @@ namespace ModuloSeguridad.Services
 {
     public class GrupoService : BaseService
     {
-        public GrupoService(ILogger logger, ModuloSeguridadContext context) : base(logger, context)
-        {
-
-        }
+        public GrupoService(ILogger logger, ModuloSeguridadContext context) : base(logger, context) { }
 
         public async Task<List<Grupo>> GetGruposAsync()
         {

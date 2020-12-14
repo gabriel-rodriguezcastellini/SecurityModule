@@ -8,7 +8,7 @@ using static ModuloSeguridad.Services.Common.Enums;
 
 namespace ModuloSeguridad.Frontend.Models.Usuarios
 {
-    public class UsuariosIndexViewModel : BaseViewModel
+    public class UsuarioIndexViewModel
     {
         [Display(Name ="Apellido y Nombre")]
         public string ApellidoNombre { get; set; }        
@@ -20,7 +20,7 @@ namespace ModuloSeguridad.Frontend.Models.Usuarios
 
         public List<SelectListItem> Grupos { get; set; }
 
-        public List<Usuario> Usuarios { get; set; } = new List<Usuario>();
+        public List<Usuario> Usuarios { get; set; } = new List<Usuario>();        
 
         public class Usuario
         {

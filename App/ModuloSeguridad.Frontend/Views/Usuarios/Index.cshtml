@@ -1,5 +1,12 @@
-﻿@model UsuariosIndexViewModel
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+﻿@model UsuarioIndexViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
 @{
     var accionModulos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<UsuarioViewModel.AccionModulo>>(HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.UserData).Value);
 }
@@ -13,6 +20,9 @@
         <h1>Gestionar Usuarios</h1>
     </div>
 </div>
+
+<input type="hidden" id="RequestVerificationToken"
+       name="RequestVerificationToken" value="@GetAntiXsrfRequestToken()">
 
 @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Leer && am.Modulo == Constantes.Modulos.Usuarios))
 {
@@ -42,7 +52,6 @@
                                                     @title = "Ingresa al menos 3 caracteres"
                                                 },
                                             })
-                                            @Html.ValidationMessageFor(u => u.ApellidoNombre, null, htmlAttributes: new { @class = "text-danger" })
                                         </div>
                                     </div>
                                 </div>
@@ -80,26 +89,26 @@
     </div>
 
     @Html.AjaxGrid(Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Index), Constantes.Modulos.Usuarios,
-        new { apellidoNombre =Model.ApellidoNombre, grupoId=Model.GrupoId}))    
+        new { apellidoNombre = Model.ApellidoNombre, grupoId = Model.GrupoId }))
 }
 
 <div class="row w-100 mx-auto">
     <div class="col">
         @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Agregar && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            <button type="button" class="btn btn-primary">Agregar</button>
+            <a class="btn btn-primary" href="@Url.Action(Constantes.Acciones.Agregar, Constantes.Modulos.Usuarios)">Agregar</a>
         }
         @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Eliminar && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            <button type="button" class="btn btn-danger">Eliminar</button>
+            <button class="btn btn-danger btn-eliminar" data-toggle="tooltip" title="Debe seleccionar un usuario de la grilla">Eliminar</button>
         }
         @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Modificar && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            <button type="button" class="btn btn-warning">Modificar</button>
+            <a class="btn btn-warning btn-modificar" data-toggle="tooltip" title="Debe seleccionar un usuario de la grilla">Modificar</a>
         }
         @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.ResetearClave && am.Modulo == Constantes.Modulos.Usuarios))
         {
-            <button type="button" class="btn btn-secondary">Resetear Clave</button>
+            <button class="btn btn-secondary btn-resetear-clave" data-toggle="tooltip" title="Debe seleccionar un usuario de la grilla">Resetear Clave</button>
         }
     </div>
 </div>
@@ -107,19 +116,82 @@
 @section Scripts {
     <script>
         $(function () {
+            var nombreUsuario = null;
+
             $(".btn-filtrar").on("click", function () {
                 if ($(".inputFiltro").val().length < 3 && $(".inputFiltro").val().length > 0) {
                     $(".inputFiltro").tooltip("show");
                     return;
                 }
+                RecargarGrilla();
+            });
 
-                var grid = new MvcGrid(document.querySelector(".mvc-grid"), {
-                    query: "apellidoNombre=" + $("#ApellidoNombre").val() + "&grupoId=" + $("#GrupoId").val() + "&estado=" + $("#Estado").val(),
-                    loadingDelay: 0
+            $(document).on("click", ".filaUsuario", function () {
+                $(".filaUsuario").removeClass("unique-color");
+                $(this).addClass("unique-color");
+                nombreUsuario = $(this).data("nombre-usuario");
+                $(".btn-eliminar").tooltip("dispose");
+                $(".btn-modificar").tooltip("dispose");
+                $(".btn-resetear-clave").tooltip("dispose");
+            });
+
+            $(".btn-resetear-clave").on("click", function () {
+                if (nombreUsuario == null) {
+                    return;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action(Constantes.Acciones.ResetearClave, Constantes.Modulos.Usuarios)",
+                    data: { nombreUsuario: nombreUsuario },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken", $('#RequestVerificationToken').val())
+                    }
+                })
+                    .done(function (msg) {
+                        $(".toast-body").text("Se reseteó la clave del usuario: " + msg);
+                        $('.toast').toast('show');
                 });
-                
-                grid.reload();
+            });
+
+            $(".btn-modificar").on("click", function () {
+                if (nombreUsuario == null) {
+                    return;
+                }
+                location.href = "@Url.Action(Constantes.Acciones.Modificar, Constantes.Modulos.Usuarios)/" + nombreUsuario;
+            });
+
+            $(".btn-eliminar").on("click", function () {
+                if (nombreUsuario == null) {
+                    return;
+                }
+                $("#eliminarModalLabel").text("Confirme la eliminación del usuario seleccionado");
+                $("#eliminarModal").modal("show");
+            });
+
+            $("#btn-eliminar").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action(Constantes.Acciones.Eliminar, Constantes.Modulos.Usuarios)",
+                    data: { nombreUsuario: nombreUsuario },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken", $('#RequestVerificationToken').val())
+                    }
+                })
+                    .done(function (msg) {
+                        $("#eliminarModal").modal("hide");
+                        $(".toast-body").text("Usuario " + msg + " eliminado");
+                        $('.toast').toast('show');
+                        RecargarGrilla();
+                });
             });
         });
+
+        function RecargarGrilla() {
+            var grid = new MvcGrid(document.querySelector(".mvc-grid"), {
+                query: "apellidoNombre=" + $("#ApellidoNombre").val() + "&grupoId=" + $("#GrupoId").val() + "&estado=" + $("#Estado").val(),
+                loadingDelay: 0
+            });
+            grid.reload();
+        }
     </script>
 }
