@@ -18,6 +18,10 @@ namespace ModuloSeguridad.Services.Common
 
         public enum EstadoGrupos
         {
+            /// <summary>
+            /// Usado solo para las vistas
+            /// </summary>
+            Todos,
             Activo,
             Inactivo
         }

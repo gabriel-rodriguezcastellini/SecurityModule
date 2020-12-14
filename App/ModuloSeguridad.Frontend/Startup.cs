@@ -58,6 +58,16 @@ namespace ModuloSeguridad.Frontend
                 return new EstadoUsuarioService(container.GetRequiredService<ILogger<EstadoUsuarioService>>(), container.GetRequiredService<ModuloSeguridadContext>());
             });
 
+            services.AddTransient((container) =>
+            {
+                return new ModuloService(container.GetRequiredService<ILogger<ModuloService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+            });
+
+            services.AddTransient((container) =>
+            {
+                return new EstadoGrupoService(container.GetRequiredService<ILogger<EstadoGrupoService>>(), container.GetRequiredService<ModuloSeguridadContext>());
+            });
+
             #region Autorizacion
             services.AddSingleton<IAuthorizationPolicyProvider, AccionModuloPolicyProvider>();
             services.AddSingleton<IAuthorizationHandler, AccionModuloAuthorizationHandler>();            

@@ -1,0 +1,23 @@
+﻿@model IQueryable<GrupoIndexViewModel.Grupo>
+@(Html
+    .Grid(Model)
+    .Build(columns =>
+    {
+        columns.Add(model=>model.Codigo).Titled("Código");
+        columns.Add(model=>model.Descripcion).Titled("Descripción");
+        columns.Add(model => model.Estado).Titled("Estado");
+    })
+    .AppendCss("table-hover")
+    .RowAttributed(model => new { @class = "filaGrupo", data_grupo_id = model.GrupoId, @style="cursor:pointer"})
+    .Using(GridFilterMode.Header)
+    .Empty("Datos no encontrados")
+    .Sortable()
+    .Pageable(pager=>
+    {
+        pager.PageSizes = new Dictionary<int, string> { { 2, "2" }, { 4, "4" }, { 5, "5" } };
+        pager.ShowPageSizes = true;
+        pager.PagesToDisplay = 3;
+        pager.CurrentPage = 1;
+        pager.RowsPerPage = 5;
+    })
+)

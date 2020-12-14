@@ -47,7 +47,7 @@
                                                 htmlAttributes = new
                                                 {
                                                     @class = "form-control inputFiltro",
-                                                @placeholder = "Ingresa al menos 3 caracteres",
+                                                    @placeholder = "Ingresa al menos 3 caracteres",
                                                     @data_toggle = "tooltip",
                                                     @title = "Ingresa al menos 3 caracteres"
                                                 },
@@ -89,7 +89,7 @@
     </div>
 
     @Html.AjaxGrid(Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Index), Constantes.Modulos.Usuarios,
-        new { apellidoNombre = Model.ApellidoNombre, grupoId = Model.GrupoId }))
+        new { apellidoNombre = Model.ApellidoNombre, grupoId = Model.GrupoId, estado = Model.Estado }))
 }
 
 <div class="row w-100 mx-auto">
@@ -135,7 +135,7 @@
                 $(".btn-resetear-clave").tooltip("dispose");
             });
 
-            $(".btn-resetear-clave").on("click", function () {
+            $("#btn-resetear-clave").on("click", function () {
                 if (nombreUsuario == null) {
                     return;
                 }
@@ -148,6 +148,7 @@
                     }
                 })
                     .done(function (msg) {
+                        $("#resetearClaveModal").modal("hide");
                         $(".toast-body").text("Se reseteó la clave del usuario: " + msg);
                         $('.toast').toast('show');
                 });
@@ -166,6 +167,14 @@
                 }
                 $("#eliminarModalLabel").text("Confirme la eliminación del usuario seleccionado");
                 $("#eliminarModal").modal("show");
+            });
+
+            $(".btn-resetear-clave").on("click", function () {
+                if (nombreUsuario == null) {
+                    return;
+                }
+                $("#resetearClaveModalLabel").text("Confirme el reseteo de clave del usuario seleccionado");
+                $("#resetearClaveModal").modal("show");
             });
 
             $("#btn-eliminar").on("click", function () {

@@ -40,9 +40,7 @@ namespace ModuloSeguridad.Frontend.Models.Usuarios
         public class Grupo
         {
             public int GrupoId { get; set; }
-
             public string Nombre { get; set; }
-
             public bool Checked { get; set; }
         }
     }

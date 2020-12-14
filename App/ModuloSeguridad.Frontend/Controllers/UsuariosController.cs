@@ -66,7 +66,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(MethodBase.GetCurrentMethod().Name);
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
                 logger.LogInformation("Usuario: " + model.NombreUsuario);
                 Usuario usuario;
                 List<Claim> claims;
@@ -106,7 +106,7 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
             finally
             {
-                logger.FinMetodo(MethodBase.GetCurrentMethod().Name);
+                logger.FinMetodo(ControllerContext.ActionDescriptor.ActionName);
                 usuarioService?.Dispose();
             }
         }
@@ -209,20 +209,14 @@ namespace ModuloSeguridad.Frontend.Controllers
                 };
                 usuarioIndexViewModel.Grupos.AddRange((await grupoService.GetGruposAsync())
                     .Select(g => new SelectListItem() { Value = g.GrupoId.ToString(), Text = g.Codigo }));
-                var usuarios = await usuarioService.GetUsuariosAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), apellidoNombre, grupoId, estado);
-                logger.LogInformation("Mostrando {cantidad} usuarios", usuarios?.Count());
-                foreach (var item in usuarios)
+                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest") 
                 {
-                    usuarioIndexViewModel.Usuarios.Add(new UsuarioIndexViewModel.Usuario()
-                    {
-                        NombreUsuario = item.NombreUsuario,
-                        ApellidoNombre = string.Concat(item.Apellido, " ", item.Nombre),
-                        Grupos = string.Join(", ", item.UsuarioGrupos?.Select(ug => ug.Grupo?.Codigo)),
-                        Email = item.Mail,
-                        Estado = item.EstadoUsuario.Nombre
-                    });
+                    return PartialView("_IndexGrid", 
+                        (await usuarioService.GetUsuariosAsync(User.FindFirstValue(ClaimTypes.NameIdentifier), apellidoNombre, grupoId, estado))
+                        .Select(u=>new UsuarioIndexViewModel.Usuario() { NombreUsuario = u.NombreUsuario, ApellidoNombre = string.Concat(u.Apellido, " ", u.Nombre),
+                            Grupos = string.Join(", ", u.UsuarioGrupos.Select(ug => ug.Grupo.Codigo)), Email = u.Mail, Estado = u.EstadoUsuario.Nombre
+                        }).AsQueryable());
                 }
-                if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest") return PartialView("_IndexGrid", usuarioIndexViewModel.Usuarios.AsQueryable());
                 return View(usuarioIndexViewModel);
             }
             catch (Exception e)
@@ -311,7 +305,7 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
         }        
 
-        [AccionModuloAuthorize(Constantes.Acciones.Modificar, Constantes.Modulos.Usuarios)]        
+        [AccionModuloAuthorize(Constantes.Acciones.Modificar, Constantes.Modulos.Usuarios)]
         public async Task<IActionResult> Modificar(string id)
         {
             try
@@ -335,7 +329,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                     Nombre = usuario.Nombre,
                     Mail = usuario.Mail,
                     Activo = usuario.EstadoUsuario.Nombre == EstadoUsuarios.Activo.ToString(),
-                    Grupos = grupos.Select(g=>new UsuarioModificarViewModel.Grupo() { Checked = usuario.UsuarioGrupos?
+                    Grupos = grupos.ToList().Select(g=>new UsuarioModificarViewModel.Grupo() { Checked = usuario.UsuarioGrupos?
                                     .Any(ug => ug.GrupoId == g.GrupoId) == true, GrupoId = g.GrupoId, Nombre = g.Codigo }).ToList()
                 };
                 return View(model);
@@ -394,74 +388,5 @@ namespace ModuloSeguridad.Frontend.Controllers
                 return Json(nombreUsuario);
             }
         }
-
-        //// GET: Usuarios/Edit/5
-        //public async Task<IActionResult> Edit(string id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var usuario = await _context.Usuarios.FindAsync(id);
-        //    if (usuario == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["EstadoUsuarioId"] = new SelectList(_context.EstadoUsuarios, "EstadoUsuarioId", "Nombre", usuario.EstadoUsuarioId);
-        //    return View(usuario);
-        //}
-
-        //// POST: Usuarios/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(string id, [Bind("NombreUsuario,Nombre,Apellido,Clave,Mail,EstadoUsuarioId,Eliminado,FechaCreacion,FechaActualizacion,FechaEliminacion,CreadoPor,ActualizadoPor,EliminadoPor")] Usuario usuario)
-        //{
-        //    if (id != usuario.NombreUsuario)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(usuario);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!UsuarioExists(usuario.NombreUsuario))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["EstadoUsuarioId"] = new SelectList(_context.EstadoUsuarios, "EstadoUsuarioId", "Nombre", usuario.EstadoUsuarioId);
-        //    return View(usuario);
-        //}        
-
-        //// POST: Usuarios/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id)
-        //{
-        //    var usuario = await _context.Usuarios.FindAsync(id);
-        //    _context.Usuarios.Remove(usuario);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //private bool UsuarioExists(string id)
-        //{
-        //    return _context.Usuarios.Any(e => e.NombreUsuario == id);
-        //}
     }
 }

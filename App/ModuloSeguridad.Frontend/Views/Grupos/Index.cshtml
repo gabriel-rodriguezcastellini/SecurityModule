@@ -1,0 +1,162 @@
+﻿@model GrupoIndexViewModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@{
+    var accionModulos = Newtonsoft.Json.JsonConvert.DeserializeObject<List<UsuarioViewModel.AccionModulo>>(HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.UserData).Value);
+}
+@{
+    ViewData["Title"] = "Gestionar grupos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row w-100 mx-auto">
+    <div class="col">
+        <h1>Gestionar Grupos</h1>
+    </div>
+</div>
+
+<input type="hidden" id="RequestVerificationToken"
+       name="RequestVerificationToken" value="@GetAntiXsrfRequestToken()">
+
+@if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Leer && am.Modulo == Constantes.Modulos.Grupos))
+{
+    <div class="row w-100 mx-auto no-gutters my-4">
+        <div class="col">
+            <fieldset class="border">
+                <div class="row w-100 mx-auto">
+                    <div class="col">
+                        <p>Filtros</p>
+                    </div>
+                </div>
+                <div class="row w-100 mx-auto">
+                    <div class="col-10">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group row w-100 mx-auto">
+                                    @Html.LabelFor(model => model.Descripcion, null, new { @class = "col-form-label my-auto" })
+                                    <div class="col">
+                                        <div class="md-form mt-0">
+                                            @Html.EditorFor(u => u.Descripcion, new
+                                            {
+                                                htmlAttributes = new
+                                                {
+                                                    @class = "form-control inputFiltro",
+                                                    @placeholder = "Ingresa al menos 3 caracteres",
+                                                    @data_toggle = "tooltip",
+                                                    @title = "Ingresa al menos 3 caracteres"
+                                                },
+                                            })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group row">
+                                    @Html.LabelFor(u => u.Estado, null, new { @class = "col col-form-label text-right" })
+                                    <div class="col my-auto">
+                                        <div class="md-form my-auto">
+                                            @Html.DropDownListFor(u => u.Estado, Html.GetEnumSelectList(Model.Estado.GetType()))
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 text-center">
+                        <button type="submit" class="btn btn-primary btn-filtrar">Filtrar</button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    @Html.AjaxGrid(Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.GruposController.Index), Constantes.Modulos.Grupos,
+        new { descripcion = Model.Descripcion, estado = Model.Estado }))
+}
+
+<div class="row w-100 mx-auto">
+    <div class="col">
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Agregar && am.Modulo == Constantes.Modulos.Grupos))
+        {
+            <a class="btn btn-primary" href="@Url.Action(Constantes.Acciones.Agregar, Constantes.Modulos.Grupos)">Agregar</a>
+        }
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Eliminar && am.Modulo == Constantes.Modulos.Grupos))
+        {
+            <button class="btn btn-danger btn-eliminar" data-toggle="tooltip" title="Debe seleccionar un grupo de la grilla">Eliminar</button>
+        }
+        @if (accionModulos.Any(am => am.Accion == Constantes.Acciones.Modificar && am.Modulo == Constantes.Modulos.Grupos))
+        {
+            <a class="btn btn-warning btn-modificar" data-toggle="tooltip" title="Debe seleccionar un grupo de la grilla">Modificar</a>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var grupoId = null;
+
+            $(".btn-filtrar").on("click", function () {
+                if ($(".inputFiltro").val().length < 3 && $(".inputFiltro").val().length > 0) {
+                    $(".inputFiltro").tooltip("show");
+                    return;
+                }
+                RecargarGrilla();
+            });
+
+            $(document).on("click", ".filaGrupo", function () {
+                $(".filaGrupo").removeClass("unique-color");
+                $(this).addClass("unique-color");
+                grupoId = $(this).data("grupo-id");
+                $(".btn-eliminar").tooltip("dispose");
+                $(".btn-modificar").tooltip("dispose");
+            });
+
+            $(".btn-modificar").on("click", function () {
+                if (grupoId == null) {
+                    return;
+                }
+                location.href = "@Url.Action(Constantes.Acciones.Modificar, Constantes.Modulos.Grupos)/" + grupoId;
+            });
+
+            $(".btn-eliminar").on("click", function () {
+                if (grupoId == null) {
+                    return;
+                }
+                $("#eliminarModalLabel").text("Confirme la eliminación del grupo seleccionado");
+                $("#eliminarModal").modal("show");
+            });
+
+            $("#btn-eliminar").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action(Constantes.Acciones.Eliminar, Constantes.Modulos.Grupos)",
+                    data: { grupoId: grupoId },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("RequestVerificationToken", $('#RequestVerificationToken').val())
+                    }
+                })
+                    .done(function (msg) {
+                        $("#eliminarModal").modal("hide");
+                        $(".toast-body").text("Grupo " + msg + " eliminado");
+                        $('.toast').toast('show');
+                        RecargarGrilla();
+                });
+            });
+        });
+
+        function RecargarGrilla() {
+            var grid = new MvcGrid(document.querySelector(".mvc-grid"), {
+                query: "descripcion=" + $("#Descripcion").val() + "&estado=" + $("#Estado").val(),
+                loadingDelay: 0
+            });
+            grid.reload();
+        }
+    </script>
+}

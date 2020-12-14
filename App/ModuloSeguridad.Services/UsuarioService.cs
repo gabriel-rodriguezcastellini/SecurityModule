@@ -32,6 +32,7 @@ namespace ModuloSeguridad.Services
                 logger.InicioMetodo("GetUsuarioAsync");
                 logger.LogInformation("nombreUsuario: " + nombreUsuario);
                 var usuario = await context.Usuarios
+                    .OrderBy(u=>u.NombreUsuario)
                     .Include(u => u.UsuarioGrupos)
                     .ThenInclude(ug => ug.Grupo)
                     .ThenInclude(g => g.GrupoAccionModulos)
@@ -62,10 +63,10 @@ namespace ModuloSeguridad.Services
             }
         }
 
-        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual, string apellidoNombre = null, int? grupoId = null, EstadoUsuarios estado = EstadoUsuarios.Todos)
+        public async Task<IQueryable<Usuario>> GetUsuariosAsync(string usuarioActual = null, string apellidoNombre = null, int? grupoId = null, EstadoUsuarios estado = EstadoUsuarios.Todos)
         {
-            var usuarios = (await context.Usuarios.Where(u => u.NombreUsuario != usuarioActual)
-                .Include(u => u.EstadoUsuario).Include(u => u.UsuarioGrupos).ThenInclude(ug => ug.Grupo).ToListAsync()).AsQueryable();
+            var usuarios = (await context.Usuarios.Include(u => u.EstadoUsuario).Include(u => u.UsuarioGrupos).ThenInclude(ug => ug.Grupo).ToListAsync()).AsQueryable();
+            if (!string.IsNullOrEmpty(usuarioActual)) usuarios = usuarios.Where(u => u.NombreUsuario != usuarioActual);
             if (!string.IsNullOrEmpty(apellidoNombre))
             {
                 apellidoNombre = apellidoNombre.Trim().ToLower();

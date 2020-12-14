@@ -14,13 +14,14 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>@ViewData["Title"] - @Html.Raw(IConfiguration["Properties:Application"])</title>
     <link href="~/user_security.ico" rel="icon" type="image/x-icon" />
-    
+
     <!--MDB-->
     <link href="~/lib/font-awesome/css/all.min.css" rel="stylesheet" />
     <link href="~/lib/twitter-bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/lib/mdbootstrap/css/mdb.min.css" rel="stylesheet" />
-        
+
     <link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
+    <link href="~/lib/chosen/chosen.min.css" rel="stylesheet" />
     <link href="~/css/site.css" rel="stylesheet" />
 </head>
 <body>
@@ -42,6 +43,24 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="resetearClaveModal" tabindex="-1" role="dialog" aria-labelledby="resetearClaveModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetearClaveModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-warning" id="btn-resetear-clave">Confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div aria-live="polite" aria-atomic="true" style="position: fixed; min-height: 200px; z-index:999999">
         <div class="toast" style="position: sticky; top: 0; right: 0;" data-autohide="true" data-delay="10000">
             <div class="toast-header">
@@ -50,7 +69,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="toast-body">                
+            <div class="toast-body">
             </div>
         </div>
     </div>
@@ -83,7 +102,7 @@
                     {
                         <li class="nav-item @Html.Active(Constantes.Modulos.Grupos)">
                             <a class="nav-link" href="@Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.GruposController.Index), Constantes.Modulos.Grupos)">
-                                Usuarios
+                                Grupos
                             </a>
                         </li>
                     }
@@ -122,9 +141,11 @@
     <!--MDB-->
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/mdbootstrap/js/popper.min.js"></script>
-    <script src="~/lib/twitter-bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/mdbootstrap/js/bootstrap.min.js"></script>
     <script src="~/lib/mdbootstrap/js/mdb.min.js"></script>
     <script src="~/js/mvc-grid/mvc-grid.js"></script>
+    <script src="~/lib/chosen/chosen.jquery.min.js"></script>
+    <script src="~/lib/mdbootstrap/js/modules/treeview.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script>
         $(function () {
@@ -135,6 +156,8 @@
             });
 
             $('[data-toggle="tooltip"]').tooltip();
+
+            $("select").chosen();
 
             @if (TempData[nameof(ModuloSeguridad.Frontend.Controllers.BaseController.InfoMessage)] != null)
             {
@@ -148,7 +171,6 @@
                 @:})
             }
         });
-
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

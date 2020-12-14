@@ -25,13 +25,9 @@ namespace ModuloSeguridad.Frontend.Models.Usuarios
         public class Usuario
         {
             public string NombreUsuario { get; set; }
-
             public string ApellidoNombre { get; set; }
-
             public string Grupos { get; set; }
-
             public string Email { get; set; }
-
             public string Estado { get; set; }
         }
     }

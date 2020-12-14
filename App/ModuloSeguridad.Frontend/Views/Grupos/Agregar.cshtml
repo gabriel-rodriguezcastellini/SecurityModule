@@ -1,0 +1,148 @@
+﻿@model AgregarGrupoViewModel
+@{
+    ViewData["Title"] = "Grupo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row w-100 mx-auto">
+    <div class="col-lg-6 mx-auto">
+        <h1>Crear Grupo</h1>
+    </div>
+</div>
+
+<div class="row w-100 mx-auto">
+    <div class="col-lg-6 mx-auto">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="datos-tab" data-toggle="tab" href="#datos" role="tab" aria-controls="datos"
+                   aria-selected="true">Datos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="usuarios-tab" data-toggle="tab" href="#usuarios" role="tab" aria-controls="usuarios"
+                   aria-selected="false">Usuarios</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="acciones-tab" data-toggle="tab" href="#acciones" role="tab" aria-controls="acciones"
+                   aria-selected="false">Acciones</a>
+            </li>
+        </ul>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="datos" role="tabpanel" aria-labelledby="datos-tab">
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.Codigo, null, new { @class = "col-sm-2 col-form-label my-auto" })
+                        <div class="col-sm-10">
+                            <div class="md-form mt-0">
+                                @Html.EditorFor(model => model.Codigo, new { htmlAttributes = new { @class = "form-control" }, })
+                                @Html.ValidationMessageFor(model => model.Codigo, null, htmlAttributes: new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.Descripcion, null, new { @class = "col-sm-2 col-form-label my-auto" })
+                        <div class="col-sm-10">
+                            <div class="md-form mt-0">
+                                @Html.EditorFor(model => model.Descripcion, new { htmlAttributes = new { @class = "form-control" }, })
+                                @Html.ValidationMessageFor(model => model.Descripcion, null, htmlAttributes: new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.Activo, null, new { @class = "col-sm-2 col-form-label" })
+                        <div class="col-sm-10 my-auto">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input my-auto" asp-for="Activo">
+                                <label class="custom-control-label" for="@nameof(Model.Activo)">Activo</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+                    <h6 class="pt-3 pl-3">Asignar</h6>
+                    <div class="border">
+                        @for (int i = 0; i < Model.Usuarios.Count; i++)
+                        {
+                            <div class="form-group row my-4 ml-4">
+                                <div class="col my-auto">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input my-auto" id="@Model.Usuarios[i].NombreUsuario" asp-for="Usuarios[i].Checked">
+                                        <label class="custom-control-label" for="@Model.Usuarios[i].NombreUsuario">@Html.Raw(Model.Usuarios[i].NombreApellido + " (" + Model.Usuarios[i].NombreUsuario + ")")</label>
+                                    </div>
+                                    @Html.HiddenFor(model => Model.Usuarios[i].Checked)
+                                    @Html.HiddenFor(model => Model.Usuarios[i].NombreUsuario)
+                                    @Html.HiddenFor(model => Model.Usuarios[i].NombreApellido)
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="acciones" role="tabpanel" aria-labelledby="acciones-tab">
+                    <div class="treeview w-20">
+                        <h6 class="pt-3 pl-3">Asignar</h6>
+                        <hr>
+                        <ul class="mb-1 pl-3 pb-2">
+                            @for (int i = 0; i < Model.Modulos.Count; i++)
+                            {
+                                <li>
+                                    
+                                        <i class="fas fa-angle-right rotate my-auto"></i>
+                                        <div class="custom-control custom-checkbox ml-3">
+                                            <input type="checkbox" data-modulo-id="@Model.Modulos[i].ModuloId" class="custom-control-input checkboxModulo my-auto" id="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)" asp-for="Modulos[i].Checked">
+                                            <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)">@Model.Modulos[i].ModuloNombre</label>
+                                        </div>
+                                    
+                                    @Html.HiddenFor(model => Model.Modulos[i].Checked)
+                                    @Html.HiddenFor(model => Model.Modulos[i].ModuloNombre)
+                                    @Html.HiddenFor(model => Model.Modulos[i].ModuloId)
+
+                                    <ul class="nested">
+                                        @for (int j = 0; j < Model.Modulos[i].Acciones.Count; j++)
+                                        {
+                                            <li>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" data-modulo-id="@Model.Modulos[i].ModuloId" class="custom-control-input checkboxAccion my-auto" id="@string.Concat(Model.Modulos[i].Acciones[j].AccionNombre, Model.Modulos[i].Acciones[i].AccionId)" asp-for="Modulos[i].Acciones[j].Checked">
+                                                    <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].Acciones[j].AccionNombre, Model.Modulos[i].Acciones[i].AccionId)">@Model.Modulos[i].Acciones[j].AccionNombre</label>
+                                                </div>
+                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].AccionId)
+                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].AccionNombre)
+                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].Checked)
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>                                
+                            }                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <a href="@Url.Action(nameof(ModuloSeguridad.Frontend.Controllers.UsuariosController.Index), Constantes.Modulos.Grupos)" class="btn btn-primary">Cancelar</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('.treeview').mdbTreeview();
+
+            $(".checkboxModulo").on("click", function () {
+                var checked = $(this).prop("checked");
+                $(".checkboxAccion[data-modulo-id=" + $(this).data("modulo-id") + "]").each(function (index, value) {
+                    $(this).prop("checked", checked);
+                });
+                
+            });
+        });
+    </script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
