@@ -142,11 +142,13 @@
                         xhr.setRequestHeader("RequestVerificationToken", $('#RequestVerificationToken').val())
                     }
                 })
-                    .done(function (msg) {
+                    .done(function (response) {
                         $("#eliminarModal").modal("hide");
-                        $(".toast-body").text("Grupo " + msg + " eliminado");
+                        $(".toast-body").text(response.message);
                         $('.toast').toast('show');
-                        RecargarGrilla();
+                        if (response.success == "true") {                            
+                            RecargarGrilla();
+                        }                        
                 });
             });
         });

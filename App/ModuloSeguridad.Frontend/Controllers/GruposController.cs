@@ -71,7 +71,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         [AccionModuloAuthorize(nameof(Constantes.Acciones.Agregar), nameof(Constantes.Modulos.Grupos))]
         public async Task<IActionResult> Agregar()
         {
-            var grupo = new AgregarGrupoViewModel()
+            var grupo = new GrupoAgregarViewModel()
             {
                 Activo = true
             };
@@ -79,13 +79,13 @@ namespace ModuloSeguridad.Frontend.Controllers
             using (usuarioService)
             {
                 grupo.Usuarios = (await usuarioService.GetUsuariosAsync())
-                    .Select(u => new AgregarGrupoViewModel.Usuario {NombreUsuario = u.NombreUsuario, Checked = false, 
+                    .Select(u => new GrupoAgregarViewModel.Usuario {NombreUsuario = u.NombreUsuario, Checked = false, 
                         NombreApellido = string.Concat(u.Nombre," ",u.Apellido) }).ToList();
-                grupo.Modulos = (await moduloService.ModulosAsync()).Select(m => new AgregarGrupoViewModel.AccionModulos()
+                grupo.Modulos = (await moduloService.ModulosAsync()).Select(m => new GrupoAgregarViewModel.AccionModulos()
                 {
                     ModuloId = m.ModuloId,
                     ModuloNombre = m.Nombre,
-                    Acciones = m.AccionModulos.Select(am => new AgregarGrupoViewModel.Accion()
+                    Acciones = m.AccionModulos.Select(am => new GrupoAgregarViewModel.Accion()
                     {
                         AccionId = am.Accion.AccionId,
                         AccionNombre = am.Accion.Nombre
@@ -98,7 +98,7 @@ namespace ModuloSeguridad.Frontend.Controllers
 
         [AccionModuloAuthorize(nameof(Constantes.Acciones.Agregar), nameof(Constantes.Modulos.Grupos))]
         [HttpPost]
-        public async Task<IActionResult> Agregar(AgregarGrupoViewModel model)
+        public async Task<IActionResult> Agregar(GrupoAgregarViewModel model)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                     GrupoAccionModulos = new List<GrupoAccionModulo>()
                 };
                 logger.LogInformation("grupo: " + JsonConvert.SerializeObject(grupo));
-                foreach (var modulo in model.Modulos.Where(m=>m.Checked))
+                foreach (var modulo in model.Modulos.Where(m=>m.Acciones.Any(a=>a.Checked)))
                 {
                     logger.LogInformation("modulo: " + JsonConvert.SerializeObject(modulo));
                     foreach (var accion in modulo?.Acciones.Where(a=>a.Checked))
@@ -131,7 +131,8 @@ namespace ModuloSeguridad.Frontend.Controllers
                     CargarNotificacion("Grupo existente");
                     return View(model);
                 }
-                await grupoService.Agregar(grupo, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                await usuarioService.AgregarUsuariosGrupo(await grupoService.Agregar(grupo, User.FindFirstValue(ClaimTypes.NameIdentifier)), 
+                    model.Usuarios.Where(u=>u.Checked).Select(x=>x.NombreUsuario).ToList(), User.FindFirstValue(ClaimTypes.NameIdentifier));
                 CargarNotificacion("Grupo creado");
                 return RedirectToAction(nameof(Index));
             }
@@ -145,135 +146,133 @@ namespace ModuloSeguridad.Frontend.Controllers
             }
         }
 
-        // GET: Grupos/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [AccionModuloAuthorize(Constantes.Acciones.Eliminar, Constantes.Modulos.Grupos)]
+        [HttpPost]
+        public async Task<JsonResult> Eliminar(int grupoId)
+        {
+            var response = new Dictionary<string, string>()
+            {
+                {"success","false" }
+            };
+            using (grupoService)
+            {
+                if(await grupoService.GrupoTieneUsuarios(grupoId))
+                {
+                    CargarNotificacion("El grupo tiene usuarios, no puede ser eliminado");
+                    response["message"] = "El grupo tiene usuarios, no puede ser eliminado";
+                    return Json(response);
+                }
+                await grupoService.Eliminar(grupoId, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                CargarNotificacion("Grupo eliminado");
+                response["success"] = "true";
+                response["message"] = "Grupo eliminado";
+                return Json(response);
+            }
+        }
 
-        //    var grupo = await _context.Grupos
-        //        .Include(g => g.EstadoGrupo)
-        //        .FirstOrDefaultAsync(m => m.GrupoId == id);
-        //    if (grupo == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [AccionModuloAuthorize(nameof(Constantes.Acciones.Modificar), nameof(Constantes.Modulos.Grupos))]
+        public async Task<IActionResult> Modificar(int id)
+        {
+            try
+            {
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
+                logger.LogInformation("id: " + id);
+                var grupo = await grupoService.GetGrupoAsync(id);
+                logger.LogInformation("Se va a editar el grupo {0}", grupo.Codigo);
+                if (grupo == null)
+                {
+                    logger.LogInformation("El grupo no existe");
+                    CargarNotificacion("El grupo no existe");
+                    return RedirectToAction(nameof(Index));
+                }
+                var grupoModificar = new GrupoModificarViewModel()
+                {
+                    GrupoId = grupo.GrupoId,
+                    Codigo = grupo.Codigo,
+                    Descripcion = grupo.Descripcion,
+                    Activo = grupo.EstadoGrupo.Nombre == EstadoGrupos.Activo.ToString(),
+                    Usuarios = (await usuarioService.GetUsuariosAsync())
+                        .Select(u => new GrupoModificarViewModel.Usuario
+                        {
+                            NombreUsuario = u.NombreUsuario,
+                            Checked = u.UsuarioGrupos.Any(gu => gu.GrupoId == id),
+                            NombreApellido = string.Concat(u.Nombre, " ", u.Apellido)
+                        }).ToList(),
+                    Modulos = (await moduloService.ModulosAsync()).Select(m => new GrupoModificarViewModel.AccionModulos()
+                    {
+                        ModuloId = m.ModuloId,
+                        ModuloNombre = m.Nombre,
+                        Checked = m.AccionModulos.Any(am => am.GrupoAccionModulos.Any(gam => gam.GrupoId == id)),
+                        Acciones = m.AccionModulos.Select(am => new GrupoModificarViewModel.Accion()
+                        {
+                            AccionId = am.Accion.AccionId,
+                            AccionNombre = am.Accion.Nombre,
+                            Checked = am.GrupoAccionModulos.Any(gam => gam.GrupoId == id)
+                        }).ToList()
+                    }).ToList()
+                };
+                return View(grupoModificar);
+            }
+            catch (Exception e)
+            {
+                return RetornarError500(e, ControllerContext.ActionDescriptor.ActionName, ControllerContext.ActionDescriptor.ControllerName);
+            }
+            finally
+            {
+                usuarioService?.Dispose();
+                moduloService?.Dispose();
+                logger.FinMetodo(ControllerContext.ActionDescriptor.ActionName);
+            }
+        }
 
-        //    return View(grupo);
-        //}
-
-        //// GET: Grupos/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["EstadoGrupoId"] = new SelectList(_context.EstadoGrupos, "EstadoGrupoId", "Nombre");
-        //    return View();
-        //}
-
-        //// POST: Grupos/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("GrupoId,Codigo,EstadoGrupoId,FechaCreacion,FechaActualizacion,CreadoPor,ActualizadoPor")] Grupo grupo)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(grupo);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["EstadoGrupoId"] = new SelectList(_context.EstadoGrupos, "EstadoGrupoId", "Nombre", grupo.EstadoGrupoId);
-        //    return View(grupo);
-        //}
-
-        //// GET: Grupos/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var grupo = await _context.Grupos.FindAsync(id);
-        //    if (grupo == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["EstadoGrupoId"] = new SelectList(_context.EstadoGrupos, "EstadoGrupoId", "Nombre", grupo.EstadoGrupoId);
-        //    return View(grupo);
-        //}
-
-        //// POST: Grupos/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("GrupoId,Codigo,EstadoGrupoId,FechaCreacion,FechaActualizacion,CreadoPor,ActualizadoPor")] Grupo grupo)
-        //{
-        //    if (id != grupo.GrupoId)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(grupo);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!GrupoExists(grupo.GrupoId))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["EstadoGrupoId"] = new SelectList(_context.EstadoGrupos, "EstadoGrupoId", "Nombre", grupo.EstadoGrupoId);
-        //    return View(grupo);
-        //}
-
-        //// GET: Grupos/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var grupo = await _context.Grupos
-        //        .Include(g => g.EstadoGrupo)
-        //        .FirstOrDefaultAsync(m => m.GrupoId == id);
-        //    if (grupo == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(grupo);
-        //}
-
-        //// POST: Grupos/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var grupo = await _context.Grupos.FindAsync(id);
-        //    _context.Grupos.Remove(grupo);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //private bool GrupoExists(int id)
-        //{
-        //    return _context.Grupos.Any(e => e.GrupoId == id);
-        //}
+        [HttpPost]
+        [AccionModuloAuthorize(nameof(Constantes.Acciones.Modificar), nameof(Constantes.Modulos.Grupos))]
+        public async Task<IActionResult> Modificar(GrupoModificarViewModel model)
+        {
+            try
+            {
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
+                logger.LogInformation("Se va a modificar el grupo {0}", model.Codigo);
+                logger.LogInformation("Usuario que realiza la acción: {0}", User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var grupo = await grupoService.GetGrupoAsync(model.GrupoId);
+                grupo.Codigo = model.Codigo;
+                grupo.Descripcion = model.Descripcion;
+                grupo.EstadoGrupo = await estadoGrupoService.GetEstadoGrupoAsync(model.Activo ? EstadoGrupos.Activo.ToString() : EstadoGrupos.Inactivo.ToString());
+                grupo.GrupoAccionModulos = new List<GrupoAccionModulo>();
+                logger.LogInformation("grupo: " + grupo.Codigo);
+                foreach (var modulo in model.Modulos.Where(m => m.Acciones.Any(a=>a.Checked)))
+                {
+                    logger.LogInformation("modulo: " + JsonConvert.SerializeObject(modulo));
+                    foreach (var accion in modulo?.Acciones.Where(a => a.Checked))
+                    {
+                        logger.LogInformation("accion: " + JsonConvert.SerializeObject(accion));
+                        grupo.GrupoAccionModulos.Add(new GrupoAccionModulo()
+                        {
+                            AccionModulo = await moduloService.GetAccionModuloAsync(accion.AccionId, modulo.ModuloId)
+                        });
+                    }
+                }
+                if (!ModelState.IsValid) return View(model);
+                if (await grupoService.GrupoExiste(model.Codigo) && model.Codigo != grupo.Codigo)
+                {
+                    logger.LogInformation("Debe elegir otro código para el grupo, el mismo ya existe");
+                    CargarNotificacion("Debe elegir otro código para el grupo, el mismo ya existe");
+                    return View(model);
+                }
+                await grupoService.Modificar(grupo, User.FindFirstValue(ClaimTypes.NameIdentifier));
+                await usuarioService.AgregarUsuariosGrupo(model.GrupoId, model.Usuarios.Where(u => u.Checked).Select(x => x.NombreUsuario).ToList(), User.FindFirstValue(ClaimTypes.NameIdentifier));
+                CargarNotificacion("Grupo actualizado");
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                return RetornarError500(e, ControllerContext.ActionDescriptor.ActionName, ControllerContext.ActionDescriptor.ControllerName);
+            }
+            finally
+            {
+                estadoGrupoService?.Dispose();
+                logger.FinMetodo(ControllerContext.ActionDescriptor.ActionName);
+            }
+        }
     }
 }

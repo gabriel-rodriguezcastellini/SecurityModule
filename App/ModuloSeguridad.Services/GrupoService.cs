@@ -25,16 +25,42 @@ namespace ModuloSeguridad.Services
             return grupos.AsQueryable();
         }
 
-        public async Task Agregar(Grupo grupo, string nombreUsuario)
+        public async Task<int> Agregar(Grupo grupo, string nombreUsuario)
         {
             context.NombreUsuario = nombreUsuario;
             await context.Grupos.AddAsync(grupo);
-            await context.SaveChangesAsync();
+            return await context.SaveChangesAsync();
         }
 
         public async Task<bool> GrupoExiste(string codigo)
         {
             return await context.Grupos.AnyAsync(g => g.Codigo == codigo);
+        }
+
+        public async Task Eliminar(int grupoId, string nombreUsuario)
+        {
+            context.NombreUsuario = nombreUsuario;
+            context.Grupos.Remove(await context.Grupos.FindAsync(grupoId));
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> GrupoTieneUsuarios(int grupoId)
+        {
+            return await context.UsuarioGrupos.AnyAsync(ug => ug.GrupoId == grupoId);
+        }
+
+        public async Task<Grupo> GetGrupoAsync(int grupoId)
+        {
+            return await context.Grupos.OrderBy(g => g.GrupoId == grupoId)
+                .Include(e=>e.EstadoGrupo)
+                .Include(u => u.GrupoAccionModulos).FirstOrDefaultAsync(g => g.GrupoId == grupoId);
+        }
+
+        public async Task Modificar(Grupo grupo, string nombreUsuario)
+        {
+            context.NombreUsuario = nombreUsuario;
+            context.Grupos.Update(grupo);
+            await context.SaveChangesAsync();
         }
     }
 }

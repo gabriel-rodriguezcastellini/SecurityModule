@@ -7,17 +7,19 @@ using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Models.Grupos
 {
-    public class AgregarGrupoViewModel
+    public class GrupoModificarViewModel
     {
+        public int GrupoId { get; set; }
+
         [MinLength(3, ErrorMessage = "Por favor, no escribas menos de 3 caracteres.")]
         [MaxLength(50, ErrorMessage = "Por favor, no escribas más de 50 caracteres.")]
-        [Required(ErrorMessageResourceName =nameof(ValidationMessages.Required), ErrorMessageResourceType = typeof(ValidationMessages))]
+        [Required(ErrorMessageResourceName = nameof(ValidationMessages.Required), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string Codigo { get; set; }
-        
+
         [MaxLength(100, ErrorMessage = "Por favor, no escribas más de 100 caracteres.")]
         public string Descripcion { get; set; }
 
-        [Display(Name ="Estado")]
+        [Display(Name = "Estado")]
         public bool Activo { get; set; }
 
         public List<Usuario> Usuarios { get; set; }

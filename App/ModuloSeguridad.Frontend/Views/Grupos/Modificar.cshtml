@@ -1,4 +1,4 @@
-﻿@model GrupoAgregarViewModel
+﻿@model GrupoModificarViewModel
 @{
     ViewData["Title"] = "Grupo";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,7 +6,7 @@
 
 <div class="row w-100 mx-auto">
     <div class="col-lg-6 mx-auto">
-        <h1>Crear Grupo</h1>
+        <h1>Modificar Grupo</h1>
     </div>
 </div>
 
@@ -28,6 +28,7 @@
         </ul>
         @using (Html.BeginForm())
         {
+            @Html.HiddenFor(model=>model.GrupoId)
             @Html.AntiForgeryToken()
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="datos" role="tabpanel" aria-labelledby="datos-tab">
@@ -89,13 +90,13 @@
                             @for (int i = 0; i < Model.Modulos.Count; i++)
                             {
                                 <li>
-                                    
-                                        <i class="fas fa-angle-right rotate my-auto"></i>
-                                        <div class="custom-control custom-checkbox ml-3">
-                                            <input type="checkbox" data-modulo-id="@Model.Modulos[i].ModuloId" class="custom-control-input checkboxModulo my-auto" id="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)" asp-for="Modulos[i].Checked">
-                                            <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)">@Model.Modulos[i].ModuloNombre</label>
-                                        </div>
-                                    
+
+                                    <i class="fas fa-angle-right rotate my-auto"></i>
+                                    <div class="custom-control custom-checkbox ml-3">
+                                        <input type="checkbox" data-modulo-id="@Model.Modulos[i].ModuloId" class="custom-control-input checkboxModulo my-auto" id="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)" asp-for="Modulos[i].Checked">
+                                        <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)">@Model.Modulos[i].ModuloNombre</label>
+                                    </div>
+
                                     @Html.HiddenFor(model => Model.Modulos[i].Checked)
                                     @Html.HiddenFor(model => Model.Modulos[i].ModuloNombre)
                                     @Html.HiddenFor(model => Model.Modulos[i].ModuloId)
@@ -114,8 +115,9 @@
                                             </li>
                                         }
                                     </ul>
-                                </li>                                
-                            }                            
+                                </li>
+
+                            }
                         </ul>
                     </div>
                 </div>
@@ -139,7 +141,7 @@
                 $(".checkboxAccion[data-modulo-id=" + $(this).data("modulo-id") + "]").each(function (index, value) {
                     $(this).prop("checked", checked);
                 });
-                
+
             });
         });
     </script>

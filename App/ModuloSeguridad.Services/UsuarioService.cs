@@ -103,7 +103,7 @@ namespace ModuloSeguridad.Services
 
         public bool TienePermisoModulo(string nombreUsuario, string modulo)
         {
-            return context.Usuarios.OrderBy(u=>u.NombreUsuario).Include(u => u.UsuarioGrupos)
+            return context.Usuarios.AsNoTracking().OrderBy(u=>u.NombreUsuario).Include(u => u.UsuarioGrupos)
                 .ThenInclude(ug => ug.Grupo)
                 .ThenInclude(g => g.GrupoAccionModulos)
                 .ThenInclude(gam => gam.AccionModulo)
@@ -162,6 +162,17 @@ namespace ModuloSeguridad.Services
         public async Task<bool> EsContraseniaCorrecta(string nombreUsuario, string clave)
         {
             return (await context.Usuarios.FindAsync(nombreUsuario))?.Clave == EncryptProvider.Md5(clave);
+        }
+
+        public async Task AgregarUsuariosGrupo(int grupoId, List<string> nombreUsuarios, string nombreUsuarioActual)
+        {
+            context.NombreUsuario = nombreUsuarioActual;
+            context.UsuarioGrupos.RemoveRange(await context.UsuarioGrupos.Where(ug => ug.GrupoId == grupoId).ToListAsync());
+            foreach (var item in nombreUsuarios)
+            {
+                context.UsuarioGrupos.Add(new UsuarioGrupo() { Grupo = await context.Grupos.FindAsync(grupoId), Usuario = await context.Usuarios.FindAsync(item) });
+            }
+            await context.SaveChangesAsync();
         }
     }
 }

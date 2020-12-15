@@ -16,7 +16,9 @@ namespace ModuloSeguridad.Services
 
         public async Task<IQueryable<Modulo>> ModulosAsync()
         {
-            return (await context.Modulos.Include(am=>am.AccionModulos).ThenInclude(a=>a.Accion).ToListAsync()).AsQueryable();
+            return (await context.Modulos.Include(am=>am.AccionModulos).ThenInclude(gam=>gam.GrupoAccionModulos)
+                .Include(am => am.AccionModulos)
+                .ThenInclude(a=>a.Accion).ToListAsync()).AsQueryable();
         }
 
         public async Task<AccionModulo> GetAccionModuloAsync(int accionId, int moduloId)
