@@ -29,7 +29,8 @@ namespace ModuloSeguridad.Services
         {
             context.NombreUsuario = nombreUsuario;
             await context.Grupos.AddAsync(grupo);
-            return await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+            return grupo.GrupoId;
         }
 
         public async Task<bool> GrupoExiste(string codigo)

@@ -45,7 +45,6 @@ namespace ModuloSeguridad.Services.Extensions.Mail
             {
                 logger.InicioMetodo("EnviarMailAsync");
                 logger.LogInformation("Asunto: {asunto}", message.Subject);
-                logger.LogInformation("Mensaje: {mensaje}", message.GetTextBody(TextFormat.Text));
                 logger.LogInformation("Enviando mail para:");
                 foreach (var item in message.To)
                 {

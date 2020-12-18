@@ -89,8 +89,7 @@
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input my-auto" id="@Model.Grupos[i].GrupoId.ToString()" asp-for="Grupos[i].Checked">
                                         <label class="custom-control-label" for="@Model.Grupos[i].GrupoId.ToString()">@Model.Grupos[i].Nombre</label>
-                                    </div>
-                                    @Html.HiddenFor(model => Model.Grupos[i].Checked)
+                                    </div>                                    
                                     @Html.HiddenFor(model => Model.Grupos[i].GrupoId)
                                     @Html.HiddenFor(model => Model.Grupos[i].Nombre)
                                 </div>

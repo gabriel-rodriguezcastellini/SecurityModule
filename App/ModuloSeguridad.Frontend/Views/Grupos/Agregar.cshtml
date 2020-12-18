@@ -72,8 +72,7 @@
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" class="custom-control-input my-auto" id="@Model.Usuarios[i].NombreUsuario" asp-for="Usuarios[i].Checked">
                                         <label class="custom-control-label" for="@Model.Usuarios[i].NombreUsuario">@Html.Raw(Model.Usuarios[i].NombreApellido + " (" + Model.Usuarios[i].NombreUsuario + ")")</label>
-                                    </div>
-                                    @Html.HiddenFor(model => Model.Usuarios[i].Checked)
+                                    </div>                                    
                                     @Html.HiddenFor(model => Model.Usuarios[i].NombreUsuario)
                                     @Html.HiddenFor(model => Model.Usuarios[i].NombreApellido)
                                 </div>
@@ -95,8 +94,7 @@
                                             <input type="checkbox" data-modulo-id="@Model.Modulos[i].ModuloId" class="custom-control-input checkboxModulo my-auto" id="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)" asp-for="Modulos[i].Checked">
                                             <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].ModuloNombre, Model.Modulos[i].ModuloId)">@Model.Modulos[i].ModuloNombre</label>
                                         </div>
-                                    
-                                    @Html.HiddenFor(model => Model.Modulos[i].Checked)
+                                                                        
                                     @Html.HiddenFor(model => Model.Modulos[i].ModuloNombre)
                                     @Html.HiddenFor(model => Model.Modulos[i].ModuloId)
 
@@ -109,8 +107,7 @@
                                                     <label class="custom-control-label" for="@string.Concat(Model.Modulos[i].Acciones[j].AccionNombre, Model.Modulos[i].Acciones[i].AccionId)">@Model.Modulos[i].Acciones[j].AccionNombre</label>
                                                 </div>
                                                 @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].AccionId)
-                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].AccionNombre)
-                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].Checked)
+                                                @Html.HiddenFor(model => Model.Modulos[i].Acciones[j].AccionNombre)                                                
                                             </li>
                                         }
                                     </ul>
