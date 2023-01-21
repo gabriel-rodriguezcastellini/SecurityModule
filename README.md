@@ -4,6 +4,6 @@
 
 .NET Core application through wich you can manage actions, modules, groups and users.
 
-## Build Status (GitHub Actions)
+## Status (GitHub Actions)
 
 [![.NET](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml/badge.svg)](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml) [![CodeQL](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/codeql.yml/badge.svg)](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/codeql.yml)
