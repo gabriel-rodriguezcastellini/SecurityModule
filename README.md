@@ -6,4 +6,4 @@
 
 ## Build Status (GitHub Actions)
 
-[![.NET](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml/badge.svg)](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml)
+[![.NET](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml/badge.svg)](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/dotnet.yml) [![CodeQL](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/codeql.yml/badge.svg)](https://github.com/gabriel-rodriguezcastellini/securityModule/actions/workflows/codeql.yml)
