@@ -65,8 +65,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("Usuario: " + model.NombreUsuario);
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 Usuario usuario;
                 List<Claim> claims;
                 ClaimsIdentity claimsIdentity;
@@ -132,8 +131,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RecuperarClave(UsuarioRecuperarClaveViewModel model)
         {
-            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction(nameof(HomeController.Index), "Home");
-            logger.LogInformation("Tratando de recuperar clave para {0}", JsonConvert.SerializeObject(model));
+            if (User?.Identity?.IsAuthenticated == true) return RedirectToAction(nameof(HomeController.Index), "Home");            
             using (usuarioService)
             {
                 if(!await usuarioService.UsuarioExiste(model.Usuario, model.Mail))
@@ -191,9 +189,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext?.ActionDescriptor?.ActionName);
-                logger.LogInformation("apellidoNombre: " + apellidoNombre);
-                logger.LogInformation("grupoId: " + grupoId);
+                logger.InicioMetodo(ControllerContext?.ActionDescriptor?.ActionName);                
                 logger.LogInformation("estado: " + estado.ToString());                
                 var usuarioIndexViewModel = new UsuarioIndexViewModel()
                 {
@@ -251,8 +247,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("model: " + JsonConvert.SerializeObject(model));
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 var usuario = new Usuario()
                 {
                     NombreUsuario = model.NombreUsuario,
@@ -309,8 +304,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("id: " + id);
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 UsuarioModificarViewModel model;
                 Usuario usuario;
                 var grupos = await grupoService.GetGruposAsync();
@@ -351,8 +345,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("model: " + JsonConvert.SerializeObject(model));
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 var usuario = await usuarioService.GetUsuarioAsync(model.NombreUsuario);
                 usuario.Apellido = model.Apellido;
                 usuario.Nombre = model.Nombre;

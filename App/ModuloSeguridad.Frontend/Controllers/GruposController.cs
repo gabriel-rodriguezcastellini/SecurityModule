@@ -44,7 +44,6 @@ namespace ModuloSeguridad.Frontend.Controllers
             try
             {
                 logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("descripcion: " + descripcion);
                 logger.LogInformation("estado: " + estado.ToString());
                 if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
@@ -99,8 +98,7 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("model: " + JsonConvert.SerializeObject(model));
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 var grupo = new Grupo()
                 {
                     Codigo = model.Codigo,
@@ -110,8 +108,7 @@ namespace ModuloSeguridad.Frontend.Controllers
                 };
                 logger.LogInformation("grupo: " + JsonConvert.SerializeObject(grupo));
                 foreach (var modulo in model.Modulos.Where(m=>m.Acciones.Any(a=>a.Checked)))
-                {
-                    logger.LogInformation("modulo: " + JsonConvert.SerializeObject(modulo));
+                {                    
                     foreach (var accion in modulo?.Acciones.Where(a=>a.Checked))
                     {
                         logger.LogInformation("accion: " + JsonConvert.SerializeObject(accion));
@@ -228,18 +225,15 @@ namespace ModuloSeguridad.Frontend.Controllers
         {
             try
             {
-                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);
-                logger.LogInformation("Se va a modificar el grupo {0}", model.Codigo);
+                logger.InicioMetodo(ControllerContext.ActionDescriptor.ActionName);                
                 logger.LogInformation("Usuario que realiza la acción: {0}", User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var grupo = await grupoService.GetGrupoAsync(model.GrupoId);
                 grupo.Codigo = model.Codigo;
                 grupo.Descripcion = model.Descripcion;
                 grupo.EstadoGrupo = await estadoGrupoService.GetEstadoGrupoAsync(model.Activo ? EstadoGrupos.Activo.ToString() : EstadoGrupos.Inactivo.ToString());
-                grupo.GrupoAccionModulos = new List<GrupoAccionModulo>();
-                logger.LogInformation("grupo: " + grupo.Codigo);
+                grupo.GrupoAccionModulos = new List<GrupoAccionModulo>();                
                 foreach (var modulo in model.Modulos.Where(m => m.Acciones.Any(a=>a.Checked)))
-                {
-                    logger.LogInformation("modulo: " + JsonConvert.SerializeObject(modulo));
+                {                    
                     foreach (var accion in modulo?.Acciones.Where(a => a.Checked))
                     {
                         logger.LogInformation("accion: " + JsonConvert.SerializeObject(accion));

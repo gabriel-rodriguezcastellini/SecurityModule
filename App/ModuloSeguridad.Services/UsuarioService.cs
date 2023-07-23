@@ -26,8 +26,7 @@ namespace ModuloSeguridad.Services
         {
             try
             {
-                logger.InicioMetodo("GetUsuarioAsync");
-                logger.LogInformation("nombreUsuario: " + nombreUsuario);
+                logger.InicioMetodo("GetUsuarioAsync");                
                 var usuario = await context.Usuarios
                     .OrderBy(u=>u.NombreUsuario)
                     .Include(u => u.UsuarioGrupos)
