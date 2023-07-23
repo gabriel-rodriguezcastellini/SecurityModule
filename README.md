@@ -2,7 +2,7 @@
 
 # Security module
 
-.NET Core application through wich you can manage actions, modules, groups and users.
+.NET Core application through which you can manage actions, modules, groups and users.
 
 ## Status (GitHub Actions)
 
