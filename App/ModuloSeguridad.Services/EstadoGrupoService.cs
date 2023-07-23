@@ -2,9 +2,6 @@
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Services

@@ -1,17 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Serilog;
-using Serilog.Events;
 using System.IO;
-using Serilog.Formatting.Compact;
-using Serilog.Extensions.Logging;
-using Serilog.Filters;
 
 namespace ModuloSeguridad.Frontend
 {
@@ -22,6 +14,7 @@ namespace ModuloSeguridad.Frontend
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
             .AddEnvironmentVariables()
+            .AddUserSecrets<Program>()
             .Build();
 
         public static void Main(string[] args)
@@ -34,6 +27,10 @@ namespace ModuloSeguridad.Frontend
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
+                webBuilder.ConfigureAppConfiguration((hostContext, builder) =>
+                {
+                    builder.AddUserSecrets<Program>();
+                });
             })
             .UseSerilog((hostingContext, services, loggerConfiguration) => loggerConfiguration
             .ReadFrom.Configuration(hostingContext.Configuration)

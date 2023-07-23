@@ -1,12 +1,9 @@
 ﻿using Bogus;
-using Bogus.Extensions;
 using Microsoft.EntityFrameworkCore;
 using ModuloSeguridad.Entities.Model;
 using NETCore.Encrypt;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,6 +82,7 @@ namespace ModuloSeguridad.Entities
 
             //comentar antes de agregar migraciones
             #region Datos de prueba
+
             var index = 0;
             var usuariosPrueba = new Faker<Usuario>("es_MX")
                 .RuleFor(u => u.Nombre, (f, u) => f.Name.FirstName())
@@ -92,8 +90,7 @@ namespace ModuloSeguridad.Entities
                 .RuleFor(u => u.NombreUsuario, (f, u) => string.Concat(f.Internet.UserName(u.Nombre, u.Apellido), index++))
                 .RuleFor(u => u.Mail, (f, u) => f.Internet.Email(u.Nombre, u.Apellido))
                 .RuleFor(u => u.Clave, (f, u) => EncryptProvider.Md5("clave"))
-                .RuleFor(u => u.EstadoUsuarioId, 1);
-
+                .RuleFor(u => u.EstadoUsuarioId, 1);            
             modelBuilder.Entity<Usuario>()
                 .HasData(usuariosPrueba.Generate(20000));
             #endregion

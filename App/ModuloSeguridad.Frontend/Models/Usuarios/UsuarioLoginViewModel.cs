@@ -1,5 +1,4 @@
-﻿using ModuloSeguridad.Entities;
-using ModuloSeguridad.Entities.Model;
+﻿using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ModuloSeguridad.Services.Extensions.Mail
+﻿namespace ModuloSeguridad.Services.Extensions.Mail
 {
     public class MailConfiguration
     {

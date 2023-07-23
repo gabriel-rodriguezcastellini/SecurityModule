@@ -3,8 +3,6 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using MimeKit.Text;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Services.Extensions.Mail

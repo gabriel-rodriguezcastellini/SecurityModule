@@ -2,11 +2,7 @@
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ModuloSeguridad.Frontend.Authorization;
-using ModuloSeguridad.Services.Common;
 using System;
-using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Controllers

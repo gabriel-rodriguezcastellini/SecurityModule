@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using ModuloSeguridad.Entities.Model;
+﻿using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ModuloSeguridad.Frontend.Models.Usuarios
 {

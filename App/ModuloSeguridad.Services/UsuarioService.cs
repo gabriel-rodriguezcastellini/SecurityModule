@@ -3,14 +3,11 @@ using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
 using ModuloSeguridad.Services.Common;
-using ModuloSeguridad.Services.Extensions;
 using ModuloSeguridad.Services.Extensions.Mail;
 using NETCore.Encrypt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using static ModuloSeguridad.Services.Common.Enums;
 

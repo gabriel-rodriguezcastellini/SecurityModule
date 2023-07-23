@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using ModuloSeguridad.Entities;
 using ModuloSeguridad.Entities.Model;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static ModuloSeguridad.Services.Common.Enums;
